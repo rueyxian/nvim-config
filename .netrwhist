@@ -1,0 +1,12 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =7
+let g:netrw_dirhist_7='e:/dev/go/src'
+let g:netrw_dirhist_6='e:/dev/go/src/gophercises'
+let g:netrw_dirhist_5='e:/dev/go/src'
+let g:netrw_dirhist_4='e:/dev/go/src/my-go-sandbox'
+let g:netrw_dirhist_3='e:/dev/go/src'
+let g:netrw_dirhist_2='e:/dev/go'
+let g:netrw_dirhist_1='e:/dev/go/src'
+let g:netrw_dirhist_0='e:/dev/go/src/gophercises/04-html-link-parser/solution/link'
+let g:netrw_dirhist_9='e:/dev/go/src/gophercises/04-html-link-parser/solution'
+let g:netrw_dirhist_8='e:/dev/go/src/gophercises/04-html-link-parser'
