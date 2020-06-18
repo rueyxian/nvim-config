@@ -16,6 +16,8 @@ Plug 'ctrlpvim/ctrlp.vim'
 "Plug 'junegunn/fzf'
 "Plug 'valloric/youcompleteme'
 "Plug 'mbbill/undotree'
+"Plug 'shougo/vimshell.vim'
+"Plug 'shougo/vimproc.vim'
 Plug 'fatih/vim-go'
 
 call plug#end()
@@ -23,13 +25,16 @@ call plug#end()
 " ----------------------------------------}}}
 
 
+let mapleader = " "
+
+
 " Color Scheme ----------------------------------------{{{
 
-"colorscheme molokai
-"normal! :AirlineTheme molokai
+colorscheme molokai
+normal! :AirlineTheme molokai
 
-colorscheme gruvbox	
-normal! :AirlineTheme gruvbox
+"colorscheme gruvbox	
+"normal! :AirlineTheme gruvbox
 
 "let g:gruvbox_contrast_dark='hard'
 "let g:airline_powerline_fonts = 1
@@ -40,17 +45,19 @@ normal! :AirlineTheme gruvbox
 " ----------------------------------------}}}
 
 "ctrlpvim/ctrlp.vim ----------------------------------------{{{
-
+let g:ctrlp_cmd = 'CtrlPBuffer'
 " ----------------------------------------}}}
 
-
 " scrooloose/nerdtree ----------------------------------------{{{
-
+cd e:/dev
 autocmd StdinReadPre * let s:std_in=1
 autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-nnoremap <silent> <leader>tf :NERDTreeFind<CR>
+nnoremap <silent> <leader><leader>t :NERDTreeFind<cr>
 nnoremap <silent> <leader>t :NERDTreeToggle<CR>
+
+
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
 let NERDTreeAutoDeleteBuffer = 1
 let NERDTreeQuitOnOpen = 1
@@ -62,6 +69,7 @@ let NERDTreeDirArrows = 1
 let g:NERDTreeWinSize = 40
 let g:TList_WinWidth = 40
 " ----------------------------------------}}}
+"
 
 
 
@@ -103,6 +111,7 @@ set number
 set relativenumber
 set nowrap
 set textwidth=0
+set splitright
 "set smartcase 
 "set noswapfile
 "set nobackup
@@ -155,13 +164,11 @@ endfunction
 " ----------------------------------------}}}
 
 
-
 " key mapping ----------------------------------------{{{
 
 "command! WipeReg for i in range(34,122) | silent! call setreg(nr2char(i), []) | endfor
 autocmd FileType vim nnoremap <buffer> <F11> :source %<cr>
 
-let mapleader = " "
 
 "# options shortcut ----------------------------------------{{{
 nnoremap <F3> :set nu! <CR>
@@ -179,8 +186,63 @@ nnoremap <F12> :edit $MYVIMRC<cr>
 nnoremap <leader>rmh :call RemoveHighlight() <cr>
 
 function! RemoveHighlight()
-	let @/ = "" 		
+	let @/ = "" 	
 endfunction
+" ----------------------------------------}}}
+
+"# terminal emulator ----------------------------------------{{{
+
+nnoremap <silent> <c-`> :call TerminalEmulatorToggle() <cr> 
+let t:terminalEmulatorIsOpen = 0
+let t:terminalWinNumber = -1
+
+function! Tt()
+	"normal! :cd c:/
+	"execute "normal! :cd ".'c:\/' 
+	"cd c:/
+	execute ":cd ".'c:/'
+endfunction
+
+
+function! TerminalEmulatorToggle()
+	if t:terminalWinNumber == -1
+		let l:path =  StringReplaceCharacter(expand('%:h'), '\', '/')
+		:echom expand('%:h')[:2]	
+		"cd expand('%:h')[:2]
+		"execute "normal! :cd " . expand('%:h')[:2] 
+		"execute "normal! :cd " . l:path[:2] 
+		"execute "normal! :cd c:\\"
+		"let l:test = 'c:/'	
+		"cd c:\		 
+	execute ":cd ".expand('%:h')[:2]
+		let @" = "cd ".l:path 
+
+		:vsp
+		":terminal cd
+		:terminal
+		:vertical resize 80
+		execute ":normal! pi"
+		let t:terminalWinNumber = winnr()
+	else
+		try
+			execute t:terminalWinNumber . "wincmd w"
+			:bd!
+		finally
+			let t:terminalWinNumber = -1
+		endtry	
+	endif
+endfunction
+
+tnoremap <silent> <c-`> <c-\><c-n> :call CloseTerminalBufferInTerminalMode() <cr>
+tnoremap <c-j> <c-\><c-n>
+"tnoremap <leader><cr> :call Tt()
+tnoremap <c-r> <cr> 
+
+function! CloseTerminalBufferInTerminalMode()
+	:bd!
+	let t:terminalWinNumber = -1
+endfunction
+
 " ----------------------------------------}}}
 
 "# remap jkhl motion ----------------------------------------{{{
@@ -338,6 +400,18 @@ function! RemoveTrailingWhiteSpace()
 	while CursorCharacter() ==# " "
 		normal! x
 	endwhile
+endfunction
+
+function! StringReplaceCharacter(str, char, replace)
+	let l:ret = ''	
+	for c in split(a:str, '\zs')	
+		if c ==# a:char
+			let l:ret .=  a:replace	
+		else
+			let l:ret .= c
+		endif
+	endfor
+	return l:ret
 endfunction
 
 " ----------------------------------------}}}
