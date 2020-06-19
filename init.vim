@@ -16,8 +16,8 @@ Plug 'ctrlpvim/ctrlp.vim'
 "Plug 'junegunn/fzf'
 "Plug 'valloric/youcompleteme'
 "Plug 'mbbill/undotree'
-"Plug 'shougo/vimshell.vim'
-"Plug 'shougo/vimproc.vim'
+Plug 'shougo/vimshell.vim'
+Plug 'shougo/vimproc.vim'
 Plug 'fatih/vim-go'
 
 call plug#end()
@@ -35,8 +35,8 @@ normal! :AirlineTheme molokai
 
 "colorscheme gruvbox	
 "normal! :AirlineTheme gruvbox
-
 "let g:gruvbox_contrast_dark='hard'
+"
 "let g:airline_powerline_fonts = 1
 "let g:airline_left_sep= '▶'
 "let g:airline_right_sep= '◀'
@@ -50,12 +50,14 @@ let g:ctrlp_cmd = 'CtrlPBuffer'
 
 " scrooloose/nerdtree ----------------------------------------{{{
 cd e:/dev
-autocmd StdinReadPre * let s:std_in=1
-autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
+"autocmd StdinReadPre * let s:std_in=1
+"autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-nnoremap <silent> <leader><leader>t :NERDTreeFind<cr>
-nnoremap <silent> <leader>t :NERDTreeToggle<CR>
+"nnoremap <silent> <leader><leader>t :NERDTreeFind<cr>
+"nnoremap <silent> <leader>t :NERDTreeToggle<CR>
 
+nnoremap <leader><leader>f :NERDTreeFind<cr>
+nnoremap <leader>f :NERDTreeToggle<CR>
 
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
@@ -63,37 +65,12 @@ let NERDTreeAutoDeleteBuffer = 1
 let NERDTreeQuitOnOpen = 1
 let g:NERDTreeDirArrowExpandable = 'ᐳ'
 let g:NERDTreeDirArrowCollapsible = 'ᐯ'
-"nnoremap <c-j> :NERDTree-j
-let NERDTreeMinimalUI = 0
+let NERDTreeMinimalUI = 1
 let NERDTreeDirArrows = 1
 let g:NERDTreeWinSize = 40
 let g:TList_WinWidth = 40
 " ----------------------------------------}}}
 "
-
-
-
-"================================================================================
-" rip grep plugin
-"================================================================================
-"if executable('rg')
-"  let g:rg_derive_root='true'
-"endif
-
-
-" kien/ctrlp plugini
-"================================================================================
-"let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
-"let g:ctrlp_use_caching = 0
-
-
-"================================================================================
-" netrw
-"================================================================================
-"let g:netrw_browse_split = 2
-"let g:netrw_banner = 0
-"let g:netrw_winsize = 25
-
 
 
 
@@ -130,9 +107,13 @@ set listchars=space:·,tab:→\ ,eol:↲
 set scrolloff=999
 "set colorcolumn=80
 "highlight ColorColumn ctermbg=0 guibg=lightgrey
+if has('nvim')
+	highlight! TermCursorNC guibg=red guifg=white ctermbg=1 ctermfg=15
+endif
 
 set hidden
 
+"autocmd BufCreate,BufEnter * lcd %:p:h
 "
 " ----------------------------------------}}}
 
@@ -163,86 +144,57 @@ endfunction
 
 " ----------------------------------------}}}
 
+" command ----------------------------------------{{{
+
+"cnoremap <expr> %% getcmdtype() == ':' ? expand('%:h').'/' : '%%'
+
+"# change to directory of current file ----------------------------------------{{{
+command! Cdc cd %:p:h
+" ----------------------------------------}}}
+
+"# remove search highlight ----------------------------------------{{{
+command! Hlc let @/=""
+" ----------------------------------------}}}
+
+"# clear messages ----------------------------------------{{{
+command! Msg :messages
+command! Msgc :messages clear
+" ----------------------------------------}}}
+
+"# toggle number and relative number ----------------------------------------{{{
+command! Nu :set nu!<CR>
+command! Rnu :set rnu!<CR>
+" ----------------------------------------}}}
+
+"# toggle list ----------------------------------------{{{
+command! List :set list!<CR>
+" ----------------------------------------}}}
+
+" ----------------------------------------}}}
+
 
 " key mapping ----------------------------------------{{{
 
 "command! WipeReg for i in range(34,122) | silent! call setreg(nr2char(i), []) | endfor
-autocmd FileType vim nnoremap <buffer> <F11> :source %<cr>
+"autocmd FileType vim nnoremap <buffer> <F11> :source %<cr>
 
-
-"# options shortcut ----------------------------------------{{{
-nnoremap <F3> :set nu! <CR>
-nnoremap <leader><F3> :set rnu! <CR>
-nnoremap <F2> :set list! <CR>
-nnoremap <F4> :set hlsearch! <CR>
+"# kill buffer ----------------------------------------{{{
+nnoremap <F10> :bd <CR>
+nnoremap <C-F10> :bd! <CR>
 " ----------------------------------------}}}
 "
-"# edit vimrc ----------------------------------------{{{
-"nnoremap <leader>ev :vsplit $MYVIMRC<cr>
-nnoremap <F12> :edit $MYVIMRC<cr>
-" ----------------------------------------}}}
-
-"# remove highlight ----------------------------------------{{{
-nnoremap <leader>rmh :call RemoveHighlight() <cr>
-
-function! RemoveHighlight()
-	let @/ = "" 	
-endfunction
+"# edit vimrc or resource vimrc ----------------------------------------{{{
+nnoremap <expr> <F12> &filetype ==# 'vim' ? ":source %<CR>" : ":edit $MYVIMRC<CR>"
 " ----------------------------------------}}}
 
 "# terminal emulator ----------------------------------------{{{
 
-nnoremap <silent> <c-`> :call TerminalEmulatorToggle() <cr> 
-let t:terminalEmulatorIsOpen = 0
-let t:terminalWinNumber = -1
+tnoremap <C-j> <C-\><C-n>
 
-function! Tt()
-	"normal! :cd c:/
-	"execute "normal! :cd ".'c:\/' 
-	"cd c:/
-	execute ":cd ".'c:/'
-endfunction
+"nnoremap <F6> :let $VIM_DIR=expand('%:p:h')<CR>:terminal<CR>cd $VIM_DIR<CR>
 
-
-function! TerminalEmulatorToggle()
-	if t:terminalWinNumber == -1
-		let l:path =  StringReplaceCharacter(expand('%:h'), '\', '/')
-		:echom expand('%:h')[:2]	
-		"cd expand('%:h')[:2]
-		"execute "normal! :cd " . expand('%:h')[:2] 
-		"execute "normal! :cd " . l:path[:2] 
-		"execute "normal! :cd c:\\"
-		"let l:test = 'c:/'	
-		"cd c:\		 
-	execute ":cd ".expand('%:h')[:2]
-		let @" = "cd ".l:path 
-
-		:vsp
-		":terminal cd
-		:terminal
-		:vertical resize 80
-		execute ":normal! pi"
-		let t:terminalWinNumber = winnr()
-	else
-		try
-			execute t:terminalWinNumber . "wincmd w"
-			:bd!
-		finally
-			let t:terminalWinNumber = -1
-		endtry	
-	endif
-endfunction
-
-tnoremap <silent> <c-`> <c-\><c-n> :call CloseTerminalBufferInTerminalMode() <cr>
-tnoremap <c-j> <c-\><c-n>
-"tnoremap <leader><cr> :call Tt()
-tnoremap <c-r> <cr> 
-
-function! CloseTerminalBufferInTerminalMode()
-	:bd!
-	let t:terminalWinNumber = -1
-endfunction
-
+nnoremap <expr> <F2> expand('%:t')==#'cmd.exe' ? ":bd!<CR>" : ":cd %:p:h<CR>:terminal<CR>"
+nnoremap <C-F2> :terminal<CR>
 " ----------------------------------------}}}
 
 "# remap jkhl motion ----------------------------------------{{{
@@ -308,18 +260,15 @@ nnoremap \ <cr>
 " ----------------------------------------}}}
 "
 "# open line ----------------------------------------{{{
-nnoremap <cr> o<esc>
-nnoremap <s-cr> O<esc>
-nnoremap <c-cr> o
-nnoremap <c-s-cr> O
+"nnoremap <cr> o<esc>
+"nnoremap <s-cr> O<esc>
+"nnoremap <c-cr> o
+"nnoremap <c-s-cr> O
 
-"nnoremap o o<esc>
-"nnoremap <s-o> O<esc>
-"nnoremap <c-o> o
-"nnoremap <c-s-o> O
-
-inoremap <c-cr> <esc>o
-inoremap <c-s-cr> <esc>O
+nnoremap o o<esc>
+nnoremap <s-o> O<esc>
+nnoremap <c-o> o
+nnoremap <c-s-o> O
 " ----------------------------------------}}}
 
 "# wrap word with text object ----------------------------------------{{{
