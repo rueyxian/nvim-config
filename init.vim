@@ -1,6 +1,5 @@
 
 
-
 "===================
 "      Plugins      
 "===================
@@ -39,6 +38,7 @@ call plug#end()
 "====================
 " ----------------------------------------{{{
 let mapleader = " "
+set ttyfast
 set encoding=utf-8
 set noerrorbells
 set tabstop=2
@@ -54,7 +54,7 @@ set textwidth=0                                "a line will no longer be borken 
 set formatoptions-=o                            "remove auto comment when open a new line from a commented line
 set splitright
 set splitbelow
-"set noswapfile
+set noswapfile
 set nobackup
 set hidden                                      "retain buffer when window is closed 
 "set undodir=~/.vim/undodir
@@ -68,7 +68,7 @@ set noshowcmd
 set list
 set listchars=space:·,tab:→\ ,eol:↲             "[space: u00B7][tab: u2192][eol: u21b2]
 set scrolloff=999
-
+set autowrite
 
 "highlight ColorColumn ctermbg=0 guibg=lightgrey
 if has('nvim')
@@ -128,6 +128,11 @@ normal! :AirlineTheme molokai
 let g:ctrlp_cmd = 'CtrlPBuffer'
 " ----------------------------------------}}}
 
+"# exit CtrlP 
+let g:ctrlp_prompt_mappings = { 
+	\	'PrtHistory(1)'     : ['<c-s-n>'],
+	\	'PrtExit()'         : ['<c-p>', '<esc>'],
+	\	}
 
 "# delete buffer in CtrlPBuf Mode ----------------------------------------{{{
 let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
@@ -182,12 +187,12 @@ let g:TList_WinWidth = 40
 "      junegunn/fzf      
 "========================
 " ----------------------------------------{{{
-" Open files in horizontal split
-"nnoremap <silent> <Leader>s :call fzf#run({
+ "Open files in horizontal split
+"noremap <silent> <Leader>s :call fzf#run({
 "\   'down': '40%',
 "\   'sink': 'botright split' })<CR>
 
-"" Open files in vertical horizontal split
+" Open files in vertical horizontal split
 "nnoremap <silent> <Leader>v :call fzf#run({
 "\   'right': winwidth('.') / 2,
 "\   'sink':  'vertical botright split' })<CR>
@@ -196,23 +201,23 @@ let g:TList_WinWidth = 40
 
 "# select buffers
 " ----------------------------------------{{{
-function! s:buflist()
-  redir => ls
-  silent ls
-  redir END
-  return split(ls, '\n')
-endfunction
+"function! s:buflist()
+  "redir => ls
+  "silent ls
+  "redir END
+  "return split(ls, '\n')
+"endfunction
 
-function! s:bufopen(e)
-  execute 'buffer' matchstr(a:e, '^[ 0-9]*')
-endfunction
+"function! s:bufopen(e)
+  "execute 'buffer' matchstr(a:e, '^[ 0-9]*')
+"endfunction
 
-nnoremap <silent> <Leader><Enter> :call fzf#run({
-\   'source':  reverse(<sid>buflist()),
-\   'sink':    function('<sid>bufopen'),
-\   'options': '+m --bind ctrl-k:up,ctrl-j:down',
-\   'down':    len(<sid>buflist()) + 2
-\ })<CR>
+"nnoremap <silent> <Leader><Enter> :call fzf#run({
+"\   'source':  reverse(<sid>buflist()),
+"\   'sink':    function('<sid>bufopen'),
+"\   'options': '+m --bind ctrl-k:up,ctrl-j:down',
+"\   'down':    len(<sid>buflist()) + 2
+"\ })<CR>
 
 "nnoremap <silent> <Leader>p :call fzf#run({
 			"\	'source': 'rg --files --column --no-heading --hidden --follow --glob "!.git/*"', 'sink': 'e', 'down': '~30%', 'options': '--bind ctrl-o:up,ctrl-l:down'})<cr>
@@ -223,7 +228,11 @@ nnoremap <silent> <Leader><Enter> :call fzf#run({
 
 "# Open FZF search
 "nnoremap <C-f> :Files!<CR>
+"nnoremap <C-f> :Files<CR>
 "inoremap <C-f> <Esc>:BLines!<CR>
+inoremap <C-f> <Esc>:BLines!<CR>
+
+nnoremap <C-f>  :call fzf#run(fzf#wrap({'dir': '~'}))
 
 
 " ----------------------------------------}}}
@@ -259,7 +268,7 @@ augroup go
   autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2
 
   " :GoBuild and :GoTestCompile
-  autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
+	autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 
   " :GoTest
 	autocmd FileType go nmap <leader>t  <Plug>(go-test)
@@ -416,10 +425,18 @@ noremap j gj
 noremap k gk
 " ----------------------------------------}}}
 
-"# close buffer ----------------------------------------{{{
-"using ctrlpvim/ctrlp.vim plugin
-nnoremap <F10> :BD <CR>
-nnoremap <C-F10> :BD! <CR>
+"# buffers ----------------------------------------{{{
+"delete buffer without closing window (using ctrlpvim/ctrlp.vim plugin) 
+nnoremap <F10> :BD<CR>
+nnoremap <C-F10> :BD!<CR>
+
+"delete buffer
+nnoremap <Leader><F10> :bd<CR>
+nnoremap <Leader><C-F10> :bd!<CR>
+
+"next/prev buffer
+nnoremap \ :bn<CR>
+nnoremap <C-\> :bp<CR>
 " ----------------------------------------}}}
 "
 "# edit vimrc or resource vimrc ----------------------------------------{{{
@@ -429,8 +446,12 @@ nnoremap <expr> <F12> &filetype ==# 'vim' ? ":source %<CR>" : ":edit $MYVIMRC<CR
 "# create/delete terminal emulator buffer ----------------------------------------{{{
 "create terminal buffer and cd to current directory
 "delete terminal buffer by using qpkorr/vim-bufkill plugin to retain the window
-nnoremap <expr> <F3> &buftype ==# 'terminal' ? ":BD!<CR>" : ":cd %:p:h<CR>:terminal<CR>"
+nnoremap <expr> <F3> &buftype ==# 'terminal' ? ":BD!<CR>" : ":cd %:p:h<CR>:terminal<CR>i"
+nnoremap <expr> <Leader><F3> &buftype ==# 'terminal' ? ":bd!<CR>" : ":cd %:p:h<CR>:vsp<CR>:terminal<CR>i"
 nnoremap <C-F3> :terminal<CR>
+
+tnoremap <F3> <C-\><C-n>:BD!<CR>
+tnoremap <Leader><F3> <C-\><C-n>:bd!<CR>
 " ----------------------------------------}}}
 
 "# navigate errors & close quickfix window ----------------------------------------{{{
@@ -456,15 +477,16 @@ nnoremap <leader>a :cclose<CR>
 " ----------------------------------------}}}
 
 "# escape to normal mode ----------------------------------------{{{
-inoremap <C-l> <Esc>
-vnoremap <C-l> <Esc>
-tnoremap <C-l> <C-\><C-n>
+inoremap <C-;> <Esc>
+vnoremap <C-;> <Esc>
+tnoremap <C-;> <C-\><C-n>
 " ----------------------------------------}}}
 
 "# create one white space without leaving normal mode ----------------------------------------{{{
 nnoremap , a<space><Esc>
 nnoremap <C-,> i<space><Esc> 
 " ----------------------------------------}}}
+
 
 "# move next 'eow' and previous 'bow' ----------------------------------------{{{
 "nnoremap H <nop>
