@@ -10,9 +10,8 @@ call plug#begin('~/.vim/plugged')
 "Plug 'tpope/vim-fugitive'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'tomasr/molokai'
-"Plug 'fatih/molokai'
-
+"Plug 'tomasr/molokai'
+Plug 'fatih/molokai'
 Plug 'morhetz/gruvbox'
 
 Plug 'scrooloose/nerdcommenter'
@@ -26,9 +25,9 @@ Plug 'junegunn/fzf.vim'
 "Plug 'mbbill/undotree'
 "Plug 'shougo/vimshell.vim'
 "Plug 'shougo/vimproc.vim'
-"Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+"Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 
 call plug#end()
 " ----------------------------------------}}}
@@ -38,6 +37,9 @@ call plug#end()
 "====================
 " ----------------------------------------{{{
 let mapleader = " "
+filetype on
+filetype plugin on
+filetype indent on
 set ttyfast
 set encoding=utf-8
 set noerrorbells
@@ -47,15 +49,18 @@ set shiftwidth=2
 set autoindent
 "set expandtab
 "set smartindent
+set ruler
 set number
 set relativenumber
 set nowrap
 set textwidth=0                                "a line will no longer be borken to next line when pasting certain length of line
-set formatoptions-=o                            "remove auto comment when open a new line from a commented line
+set formatoptions-=o                            "remove auto comment when open a new line from a commented line in normal mode
+set formatoptions-=r                            "remove auto comment when open a new line from a commented line in insert mode
 set splitright
 set splitbelow
 set noswapfile
 set nobackup
+set fileformats=unix,dos,mac
 set hidden                                      "retain buffer when window is closed 
 "set undodir=~/.vim/undodir
 "set undofile
@@ -69,6 +74,8 @@ set list
 set listchars=space:·,tab:→\ ,eol:↲             "[space: u00B7][tab: u2192][eol: u21b2]
 set scrolloff=999
 set autowrite
+set omnifunc=syntaxcomplete#Complete
+
 
 "highlight ColorColumn ctermbg=0 guibg=lightgrey
 if has('nvim')
@@ -106,16 +113,18 @@ augroup END
 "========================
 " ----------------------------------------{{{
 syntax on
-colorscheme molokai
-normal! :AirlineTheme molokai
 
-"colorscheme gruvbox	
-"normal! :AirlineTheme gruvbox
-"let g:gruvbox_contrast_dark='hard'
-"
-"let g:airline_powerline_fonts = 1
-"let g:airline_left_sep= '▶'
-"let g:airline_right_sep= '◀'
+let g:airline_theme='gruvbox'
+let g:gruvbox_termcolors=256
+let g:gruvbox_contrast_dark='hard'
+colorscheme gruvbox	
+
+"highlight SignColumn guibg=#272822
+"let g:rehash256 = 1
+"let g:molokai_original=1
+"let g:airline_theme='molokai'
+"let NERDTreeIgnore = ['_site']
+"colorscheme molokai
 " ----------------------------------------}}}
 
 
@@ -157,18 +166,52 @@ endfunc
 
 " ----------------------------------------}}}
 
+"===================================
+"      scrooloose/nerdcommeter      
+"===================================
+" ----------------------------------------{{{
+" let g:NERDCreateDefaultMappings = 0
+
+"NERDCommenterToggle, for some reason vim registers <C-/> as <C-_>
+map <C-_> <plug>NERDCommenterToggle
+
+" Add spaces after comment delimiters by default
+let g:NERDSpaceDelims = 1
+
+" Use compact syntax for prettified multi-line comments
+"let g:NERDCompactSexyComs = 1
+
+" Align line-wise comment delimiters flush left instead of following code indentation
+let g:NERDDefaultAlign = 'left'
+
+" Set a language to use its alternate delimiters by default
+"let g:NERDAltDelims_java = 1
+
+" Add your own custom formats or override the defaults
+"let g:NERDCustomDelimiters = { 'c': { 'left': '/**','right': '*/' } }
+
+" Allow commenting and inverting empty lines (useful when commenting a region)
+" let g:NERDCommentEmptyLines = 1
+
+" Enable trimming of trailing whitespace when uncommenting
+" let g:NERDTrimTrailingWhitespace = 1
+
+" Enable NERDCommenterToggle to check all selected lins is commented or not 
+"let g:NERDToggleCheckAllLines = 1e
+" ----------------------------------------}}}
+
 
 "===============================
 "      scrooloose/nerdtree      
 "===============================
 " ----------------------------------------{{{
-cd e:/dev
+cd $HOME/go/src
 "autocmd StdinReadPre * let s:std_in=1
 "autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
 nnoremap <C-F2> :NERDTreeFind<CR>
 nnoremap <F2> :NERDTreeToggle<CR>
-cnoremap NT NERDTree
+cnoreabbrev NT <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'NERDTree' : 'NT')<CR>
 
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
@@ -197,8 +240,6 @@ let g:TList_WinWidth = 40
 "\   'right': winwidth('.') / 2,
 "\   'sink':  'vertical botright split' })<CR>
 
-
-
 "# select buffers
 " ----------------------------------------{{{
 "function! s:buflist()
@@ -225,7 +266,6 @@ let g:TList_WinWidth = 40
 
 " ----------------------------------------}}}
 
-
 "# Open FZF search
 "nnoremap <C-f> :Files!<CR>
 "nnoremap <C-f> :Files<CR>
@@ -234,7 +274,6 @@ inoremap <C-f> <Esc>:BLines!<CR>
 
 nnoremap <C-f>  :call fzf#run(fzf#wrap({'dir': '~'}))
 
-
 " ----------------------------------------}}}
 
 
@@ -242,9 +281,6 @@ nnoremap <C-f>  :call fzf#run(fzf#wrap({'dir': '~'}))
 "      fatih/vim-go      
 "========================
 " ----------------------------------------{{{
-"autocmd FileType go command! Gobuild <Plug>(go-build)
-"autocmd FileType go command! GoRun <Plug>(go-run)
-
 let g:go_fmt_command = "goimports"
 let g:go_autodetect_gopath = 1
 let g:go_list_type = "quickfix"
@@ -268,31 +304,30 @@ augroup go
   autocmd BufNewFile,BufRead *.go setlocal noexpandtab tabstop=2 shiftwidth=2
 
   " :GoBuild and :GoTestCompile
-	autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
+  "autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
 
   " :GoTest
-	autocmd FileType go nmap <leader>t  <Plug>(go-test)
+  "autocmd FileType go nmap <leader>t  <Plug>(go-test)
 
   " :GoRun
-	autocmd FileType go nmap <leader>r  <Plug>(go-run)
+  "autocmd FileType go nmap <leader>r <Plug>(go-run)
 
   " :GoDoc
-	autocmd FileType go nmap <Leader>d <Plug>(go-doc)
+  "autocmd FileType go nmap <Leader>d <Plug>(go-doc)
 
   " :GoCoverageToggle
-	autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
+  "autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
 
   " :GoInfo
-	autocmd FileType go nmap <Leader>i <Plug>(go-info)
+  "autocmd FileType go nmap <Leader>i <Plug>(go-info)
 
   " :GoMetaLinter
-	autocmd FileType go nmap <Leader>l <Plug>(go-metalinter)
+  "autocmd FileType go nmap <Leader>l <Plug>(go-metalinter)
 
   " :GoDef but opens in a vertical split
-	autocmd FileType go nmap <Leader>v <Plug>(go-def-vertical)
-
+  "autocmd FileType go nmap <Leader>v <Plug>(go-def-vertical)
   " :GoDef but opens in a horizontal split
-	autocmd FileType go nmap <Leader>s <Plug>(go-def-split)
+  "autocmd FileType go nmap <Leader>s <Plug>(go-def-split)
 
   " :GoAlternate  commands :A, :AV, :AS and :AT
   autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
@@ -310,7 +345,15 @@ function! s:build_go_files()
   elseif l:file =~# '^\f\+\.go$'
     call go#cmd#Build(0)
   endif
-endfunction
+endfunction 
+" ----------------------------------------}}}
+
+
+"=============================
+"      neoclide/coc.nvim      
+"=============================
+" ----------------------------------------{{{
+"
 " ----------------------------------------}}}
 
 
@@ -390,12 +433,16 @@ endfunction
 " ----------------------------------------}}}
 
 "# remove search highlight ----------------------------------------{{{
-command! Hlc let @/=""
+cnoreabbrev hlc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "let @/=''" : "hlc")<CR>
 " ----------------------------------------}}}
 
 "# clear messages ----------------------------------------{{{
-command! Msg :messages
-command! Msgc :messages clear
+cnoreabbrev msg <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "messages" : "msg")<CR>
+cnoreabbrev msgc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "messages clear" : "msgc")<CR>
+" ----------------------------------------}}}
+
+"# help close ----------------------------------------{{{
+cnoreabbrev hc <C-r>=(getcmdtype()==#':' && getcmdpos()==#0 ? "helpc" : "hc")<CR>
 " ----------------------------------------}}}
 
 "# toggle number and relative number ----------------------------------------{{{
@@ -460,33 +507,32 @@ map <C-m> :cprevious<CR>
 nnoremap <leader>a :cclose<CR>
 " ----------------------------------------}}}
 
-"# remap jkhl motion ----------------------------------------{{{
-"nnoremap - u
-"nnoremap u i
-"nnoremap o a
-"
-"nnoremap i k
-"nnoremap k j
-"nnoremap j h
-"nnoremap l l
-"
-"vnoremap i k
-"vnoremap k j
-"vnoremap j h
-"vnoremap l l
+"# escape to normal mode ----------------------------------------{{{
+inoremap <C-l> <Esc>
+vnoremap <C-l> <Esc>
+tnoremap <C-l> <C-\><C-n>
 " ----------------------------------------}}}
 
-"# escape to normal mode ----------------------------------------{{{
-inoremap <C-;> <Esc>
-vnoremap <C-;> <Esc>
-tnoremap <C-;> <C-\><C-n>
+"# omni completion ----------------------------------------{{{
+"auto close preview window
+"autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+
+"trigger omni completion
+inoremap <C-Space> <C-x><C-o>
+
+"omni completion navigation
+inoremap <expr> <C-j> pumvisible() ? '<C-n>' : '<C-j>'
+inoremap <expr> <C-k> pumvisible() ? '<C-p>' : '<C-k>'
+
+inoremap <expr> <C-d> pumvisible() ? "<C-n><C-n><C-n><C-n><C-n>" : "\<C-d>"
+inoremap <expr> <C-u> pumvisible() ? "<C-p><C-p><C-p><C-p><C-p>" : "\<C-u>"
 " ----------------------------------------}}}
 
 "# create one white space without leaving normal mode ----------------------------------------{{{
 nnoremap , a<space><Esc>
 nnoremap <C-,> i<space><Esc> 
 " ----------------------------------------}}}
-
 
 "# move next 'eow' and previous 'bow' ----------------------------------------{{{
 "nnoremap H <nop>
@@ -511,8 +557,18 @@ nnoremap <Leader><S-h> 0
 nnoremap <Leader><S-l> $
 " ----------------------------------------}}}
 
+"# character deletion in insert mode ----------------------------------------{{{
+"delete word after cursor (simlar to <C-w>, delete word before cursor>
+inoremap <C-e> <C-o>de
+
+"reverse backspace
+inoremap <C-d> <C-o>x
+
+"remark: <C-o> escapes to do one normal-mode command, and then return to the insert mode
+" ----------------------------------------}}}
+
 "# reverse delete character ----------------------------------------{{{
-inoremap <S-BS> <Right><BS>
+inoremap <C-BS> <Right><BS>
 " ----------------------------------------}}}
 
 "# delete line without deleting 'eol' ----------------------------------------{{{
@@ -524,8 +580,9 @@ nnoremap Y y$
 " ----------------------------------------}}}
 
 "# yank current line to next/previous line ----------------------------------------{{{
-nnoremap <C-y> ddp
-nnoremap <C-S-y> ddkP
+"nnoremap <C-y> ddp
+"nnoremap <C-S-Y> ddkP
+"nnoremap <C-S-y> ddkP
 "nnoremap <C-\> ddp 
 "nnoremap <C-S-\> ddkP 
 " ----------------------------------------}}}
@@ -535,15 +592,10 @@ nnoremap <C-S-y> ddkP
 " ----------------------------------------}}}
 
 "# open line ----------------------------------------{{{
-"nnoremap <CR> o<Esc>
-"nnoremap <S-cr> O<Esc>
-"nnoremap <C-cr> o
-"nnoremap <C-S-cr> O
-
 nnoremap o o<Esc>
 nnoremap <S-o> O<Esc>
-"nnoremap <C-o> o
-"nnoremap <C-S-o> O
+"verbose nnoremap <C-o> o
+"verbose nnoremap <C-S-o> O
 " ----------------------------------------}}}
 
 "# wrap word with text object ----------------------------------------{{{
@@ -652,10 +704,5 @@ function! StringReplaceCharacter(str, char, replace)
 endfunction
 
 " ----------------------------------------}}}
-
-
-
-
-
 
 
