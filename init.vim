@@ -6,28 +6,28 @@
 " ----------------------------------------{{{
 call plug#begin('~/.vim/plugged')
 
-"Plug 'neoclide/coc.nvim', {'branch': 'release'}
 "Plug 'tpope/vim-fugitive'
+"
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
-"Plug 'tomasr/molokai'
 Plug 'fatih/molokai'
 Plug 'morhetz/gruvbox'
 
 Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/nerdtree'
+
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'qpkorr/vim-bufkill'
 "Plug 'SirVer/ultisnips'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
-"Plug 'valloric/youcompleteme'
-"Plug 'mbbill/undotree'
-"Plug 'shougo/vimshell.vim'
-"Plug 'shougo/vimproc.vim'
+
+"Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
-"Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+
+Plug 'mattn/emmet-vim'
+
 
 call plug#end()
 " ----------------------------------------}}}
@@ -75,12 +75,14 @@ set listchars=space:·,tab:→\ ,eol:↲             "[space: u00B7][tab: u2192]
 set scrolloff=999
 set autowrite
 set omnifunc=syntaxcomplete#Complete
+" set completeopt=menuone,preview,noinsert,noselect
+set completeopt=menuone,preview,noinsert
 
-
-"highlight ColorColumn ctermbg=0 guibg=lightgrey
 if has('nvim')
-	highlight! TermCursorNC guibg=red guifg=white ctermbg=1 ctermfg=15
+	"some how does not werk =(
+	highlight! TermCursorNC guibg=red guifg=white ctermbg=12 ctermfg=15
 endif
+
 
 " Enable to copy to clipboard for operations like yank, delete, change and put
 " http://stackoverflow.com/questions/20186975/vim-mac-how-to-copy-to-clipboard-without-pbcopy
@@ -114,17 +116,17 @@ augroup END
 " ----------------------------------------{{{
 syntax on
 
-let g:airline_theme='gruvbox'
-let g:gruvbox_termcolors=256
-let g:gruvbox_contrast_dark='hard'
-colorscheme gruvbox	
+" let g:airline_theme='gruvbox'
+" let g:gruvbox_termcolors=256
+" let g:gruvbox_contrast_dark='hard'
+" colorscheme gruvbox	
 
-"highlight SignColumn guibg=#272822
-"let g:rehash256 = 1
-"let g:molokai_original=1
-"let g:airline_theme='molokai'
-"let NERDTreeIgnore = ['_site']
-"colorscheme molokai
+highlight SignColumn guibg=#272822
+let g:rehash256 = 1
+let g:molokai_original=1
+let g:airline_theme='molokai'
+let NERDTreeIgnore = ['_site']
+colorscheme molokai
 " ----------------------------------------}}}
 
 
@@ -147,8 +149,8 @@ let g:ctrlp_prompt_mappings = {
 let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
 
 func! MyCtrlPMappings()
-	nnoremap <buffer> <silent> <C--> :call <sid>DeleteBuffer(0)<CR>
-	nnoremap <buffer> <silent> <C-=> :call <sid>DeleteBuffer(1)<CR>
+	" nnoremap <buffer> <silent> <C--> :call <sid>DeleteBuffer(0)<CR>
+	nnoremap <buffer> <silent> <C--> :call <sid>DeleteBuffer(1)<CR>
 endfunc
 
 func! s:DeleteBuffer(force)
@@ -179,7 +181,7 @@ map <C-_> <plug>NERDCommenterToggle
 let g:NERDSpaceDelims = 1
 
 " Use compact syntax for prettified multi-line comments
-"let g:NERDCompactSexyComs = 1
+" let g:NERDCompactSexyComs = 1
 
 " Align line-wise comment delimiters flush left instead of following code indentation
 let g:NERDDefaultAlign = 'left'
@@ -197,7 +199,7 @@ let g:NERDDefaultAlign = 'left'
 " let g:NERDTrimTrailingWhitespace = 1
 
 " Enable NERDCommenterToggle to check all selected lins is commented or not 
-"let g:NERDToggleCheckAllLines = 1e
+let g:NERDToggleCheckAllLines = 1
 " ----------------------------------------}}}
 
 
@@ -305,7 +307,7 @@ augroup go
 
   " :GoBuild and :GoTestCompile
   "autocmd FileType go nmap <leader>b :<C-u>call <SID>build_go_files()<CR>
-
+	
   " :GoTest
   "autocmd FileType go nmap <leader>t  <Plug>(go-test)
 
@@ -314,20 +316,34 @@ augroup go
 
   " :GoDoc
   "autocmd FileType go nmap <Leader>d <Plug>(go-doc)
+	autocmd FileType go cnoreabbrev godoc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'GoDoc' : 'godoc')<CR>
 
   " :GoCoverageToggle
   "autocmd FileType go nmap <Leader>c <Plug>(go-coverage-toggle)
 
   " :GoInfo
   "autocmd FileType go nmap <Leader>i <Plug>(go-info)
+	autocmd FileType go cnoreabbrev goinfo <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'GoInfo' : 'goinfo')<CR>
 
   " :GoMetaLinter
   "autocmd FileType go nmap <Leader>l <Plug>(go-metalinter)
 
+	" :GoImplements
+	autocmd FileType go cnoreabbrev goimpl <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'GoImplements' : 'goimpl')<CR>
+
+	" :GoRename
+	autocmd FileType go cnoreabbrev gorename <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'GoRename' : 'gorename')<CR>
+
+	" :GoDef
+	autocmd FileType go cnoreabbrev godef <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'GoDef' : 'godef')<CR>
+
   " :GoDef but opens in a vertical split
-  "autocmd FileType go nmap <Leader>v <Plug>(go-def-vertical)
+	" autocmd FileType go nmap <Leader>v <Plug>(go-def-vertical)
+	autocmd FileType go nmap <buffer> <Leader>gv <Plug>(go-def-vertical)
+
   " :GoDef but opens in a horizontal split
   "autocmd FileType go nmap <Leader>s <Plug>(go-def-split)
+	autocmd FileType go nmap <buffer> <Leader>gh <Plug>(go-def-split)
 
   " :GoAlternate  commands :A, :AV, :AS and :AT
   autocmd Filetype go command! -bang A call go#alternate#Switch(<bang>0, 'edit')
@@ -356,6 +372,247 @@ endfunction
 "
 " ----------------------------------------}}}
 
+
+
+
+"====================
+"      Commands      
+"====================
+" ----------------------------------------{{{
+
+"# change directory to current buffer(not using, because autocmd do the work) ----------------------------------------{{{
+"command! Cdc  lcd %:p:h
+" ----------------------------------------}}}
+
+"# remove search highlight ----------------------------------------{{{
+cnoreabbrev hlc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "let @/=''" : "hlc")<CR>
+" ----------------------------------------}}}
+
+"# clear messages ----------------------------------------{{{
+cnoreabbrev msg <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "messages" : "msg")<CR>
+cnoreabbrev msgc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "messages clear" : "msgc")<CR>
+" ----------------------------------------}}}
+
+"# help close ----------------------------------------{{{
+cnoreabbrev hc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "helpc" : "hc")<CR>
+" ----------------------------------------}}}
+
+"# toggle number and relative number ----------------------------------------{{{
+command! Nu :set nu!<CR>
+command! Rnu :set rnu!<CR>
+" ----------------------------------------}}}
+
+"# toggle list ----------------------------------------{{{
+command! List :set list!<CR>
+" ----------------------------------------}}}
+
+" ----------------------------------------}}}
+
+
+"========================
+"      Key Mappings      
+"========================
+" ----------------------------------------{{{
+"command! WipeReg for i in range(34,122) | silent! call setreg(nr2char(i), []) | endfor
+"autocmd FileType vim nnoremap <buffer> <F11> :source %<CR>
+
+
+"# linewise vertical motion (if &warp=1) ----------------------------------------{{{
+noremap <Up> gk
+noremap <Down> gj
+noremap j gj
+noremap k gk
+" ----------------------------------------}}}
+
+"# buffers ----------------------------------------{{{
+"delete buffer without closing window (using ctrlpvim/ctrlp.vim plugin) 
+" nnoremap <F10> :BD<CR>
+nnoremap <F10> :BD!<CR>
+
+"delete buffer
+" nnoremap <Leader><F10> :bd<CR>
+nnoremap <Leader><F10> :bd!<CR>
+
+"next/prev buffer
+nnoremap \ :bn<CR>
+nnoremap <C-\> :bp<CR>
+" ----------------------------------------}}}
+"
+"# edit vimrc or resource vimrc ----------------------------------------{{{
+nnoremap <expr> <F12> &filetype ==# 'vim' ? ":source %<CR>" : ":edit $MYVIMRC<CR>"
+" ----------------------------------------}}}
+
+"# create/delete terminal emulator buffer ----------------------------------------{{{
+"create terminal buffer and cd to current directory
+"delete terminal buffer by using qpkorr/vim-bufkill plugin to retain the window
+nnoremap <expr> <F3> &buftype ==# 'terminal' ? ":BD!<CR>" : ":cd %:p:h<CR>:terminal<CR>i"
+nnoremap <expr> <Leader><F3> &buftype ==# 'terminal' ? ":bd!<CR>" : ":cd %:p:h<CR>:vsp<CR>:terminal<CR>i"
+nnoremap <C-F3> :terminal<CR>
+
+tnoremap <F3> <C-\><C-n>:BD!<CR>
+tnoremap <Leader><F3> <C-\><C-n>:bd!<CR>
+" ----------------------------------------}}}
+
+"# navigate errors & close quickfix window ----------------------------------------{{{
+map <C-n> :cnext<CR>
+map <C-m> :cprevious<CR>
+nnoremap <leader>a :cclose<CR>
+" ----------------------------------------}}}
+
+"# escape to normal mode ----------------------------------------{{{
+inoremap <C-l> <Esc>
+vnoremap <C-l> <Esc>
+tnoremap <C-l> <C-\><C-n>
+" ----------------------------------------}}}
+
+"# omni completion ----------------------------------------{{{
+"auto close preview window
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+
+"toggle omni completion
+inoremap <expr> <C-Space> pumvisible() ? "<C-e>" : "<C-x><C-o>"
+
+" open omni completion menu closing previous if open and opening new menu without changing the text
+" inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') .
+"             \ '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
+
+"navigation
+inoremap <expr> <C-j> pumvisible() ? "<C-n>" : "<C-j>"
+inoremap <expr> <C-k> pumvisible() ? "<C-p>" : "<C-k>"
+inoremap <expr> <C-d> pumvisible() ? "<C-n><C-n><C-n><C-n><C-n>" : "<C-d>"
+inoremap <expr> <C-u> pumvisible() ? "<C-p><C-p><C-p><C-p><C-p>" : "<C-u>"
+
+"accept completion
+inoremap <expr> <CR> pumvisible() ? "<C-y>" : "<CR>"
+" ----------------------------------------}}}
+
+"# move next 'eow' and previous 'bow' ----------------------------------------{{{
+" nnoremap <C-h> b
+" nnoremap <C-l> e
+" "nnoremap <C-S-h> B
+" "nnoremap <C-S-l> E
+" nnoremap <S-h> B
+" nnoremap <S-l> E
+" ----------------------------------------}}}
+"
+"# extends 'j' and 'k's motion ----------------------------------------{{{
+nnoremap <C-j> 7j
+nnoremap <C-k> 7k
+" ----------------------------------------}}}
+"
+"# move to 'bol' and 'eol' ----------------------------------------{{{
+nnoremap <C-l> :call NavigateEOL() <CR>
+nnoremap <C-h> :call NavigateBOL() <CR>
+
+function! NavigateEOL()	
+	let l:col1 = virtcol('.')
+	execute "normal! g_"
+	let l:col2 	= virtcol('.') 
+	if l:col1 ==# l:col2 
+		execute "normal! $"
+	endif
+endfunction
+
+function! NavigateBOL()	
+	let l:col1 = virtcol('.')
+	execute "normal! ^"
+	let l:col2 	= virtcol('.') 
+	if l:col1 ==# l:col2 
+		execute "normal! 0"
+	endif
+endfunction
+
+" nnoremap <Leader>h ^
+" nnoremap <Leader>l g_
+" nnoremap <Leader><S-h> 0
+" nnoremap <Leader><S-l> $
+" ----------------------------------------}}}
+
+"# character deletion in insert mode ----------------------------------------{{{
+"delete word after cursor (simlar to <C-w>, delete word before cursor>
+inoremap <C-e> <C-o>de
+
+"reverse backspace
+inoremap <C-BS> <C-o>x
+
+"remark: <C-o> escapes to do one normal-mode command, and then return to the insert mode
+" ----------------------------------------}}}
+
+"# delete line without deleting 'eol' ----------------------------------------{{{
+nnoremap dD 0d$
+" ----------------------------------------}}}
+
+"# yank until the end of the line ----------------------------------------{{{
+nnoremap Y y$
+" ----------------------------------------}}}
+
+"# yank current line to next/previous line ----------------------------------------{{{
+"nnoremap <C-y> ddp
+"nnoremap <C-S-Y> ddkP
+"nnoremap <C-S-y> ddkP
+"nnoremap <C-\> ddp 
+"nnoremap <C-S-\> ddkP 
+" ----------------------------------------}}}
+
+"# create space without leaving normal mode ----------------------------------------{{{
+nnoremap <C-Space> a<Space><Esc>
+" ----------------------------------------}}}
+
+"# open line ----------------------------------------{{{
+nnoremap o o<Esc>
+nnoremap <S-o> O<Esc>
+"verbose nnoremap <C-o> o
+"verbose nnoremap <C-S-o> O
+" ----------------------------------------}}}
+
+"# wrap word with text object ----------------------------------------{{{
+nnoremap <Leader>[ viw<Esc>a]<Esc>bi[<Esc>E
+nnoremap <Leader>( viw<Esc>a)<Esc>bi(<Esc>E
+nnoremap <Leader>{ viw<Esc>a}<Esc>bi{<Esc>E
+nnoremap <Leader>< viw<Esc>a><Esc>bi<<Esc>E
+nnoremap <Leader>' viw<Esc>a'<Esc>bi'<Esc>E
+nnoremap <Leader>" viw<Esc>a"<Esc>bi"<Esc>E
+nnoremap <Leader>` viw<Esc>a`<Esc>bi`<Esc>E
+
+nnoremap <Leader><Leader>[ viW<Esc>a]<Esc>Bi[<Esc>E
+nnoremap <Leader><Leader>( viW<Esc>a)<Esc>Bi(<Esc>E
+nnoremap <Leader><Leader>{ viW<Esc>a}<Esc>Bi{<Esc>E
+nnoremap <Leader><Leader>< viW<Esc>a><Esc>Bi<<Esc>E
+nnoremap <Leader><Leader>' viW<Esc>a'<Esc>Bi'<Esc>E
+nnoremap <Leader><Leader>" viW<Esc>a"<Esc>Bi"<Esc>E
+nnoremap <Leader><Leader>` viW<Esc>a`<Esc>Bi`<Esc>E
+" ----------------------------------------}}}
+"
+"# wrap highlighted with text object ----------------------------------------{{{
+vnoremap <Leader>[ di[]<Esc>hp
+vnoremap <Leader>( di()<Esc>hp
+vnoremap <Leader>{ di{}<Esc>hp
+vnoremap <Leader>< di<lt>><Esc>hp
+vnoremap <Leader>' di''<Esc>hp
+vnoremap <Leader>" di""<Esc>hp
+vnoremap <Leader>` di``<Esc>hp
+" ----------------------------------------}}}
+"
+"# enable text-object selection without postion cursor inside text-object ----------------------------------------{{{
+onoremap i[ :<C-u>normal! f]vi[<CR>
+onoremap i( :<C-u>normal! f)vi(<CR>
+onoremap i{ :<C-u>normal! f}vi{<CR>
+onoremap i< :<C-u>normal! f>vi<<CR>
+onoremap i' :<C-u>normal! f'vi'<CR>
+onoremap i" :<C-u>normal! f"vi"<CR>
+onoremap i` :<C-u>normal! f`vi`<CR>
+
+onoremap I[ :<C-u>normal! F]vi[<CR>
+onoremap I( :<C-u>normal! F)vi(<CR>
+onoremap I{ :<C-u>normal! F}vi{<CR>
+onoremap I< :<C-u>normal! F>vi<<CR>
+onoremap I' :<C-u>normal! F'vi'<CR>
+onoremap I" :<C-u>normal! F"vi"<CR>
+onoremap I` :<C-u>normal! F`vi`<CR>
+" ----------------------------------------}}}
+
+" ----------------------------------------}}}
 
 
 "=======================
@@ -421,229 +678,6 @@ function! BoxifyComment()
 
 	call RepeatCharacterAtCursor('=', l:len+12)
 endfunction
-" ----------------------------------------}}}
-
-"====================
-"      Commands      
-"====================
-" ----------------------------------------{{{
-
-"# change directory to current buffer(not using, because autocmd do the work) ----------------------------------------{{{
-"command! Cdc  lcd %:p:h
-" ----------------------------------------}}}
-
-"# remove search highlight ----------------------------------------{{{
-cnoreabbrev hlc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "let @/=''" : "hlc")<CR>
-" ----------------------------------------}}}
-
-"# clear messages ----------------------------------------{{{
-cnoreabbrev msg <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "messages" : "msg")<CR>
-cnoreabbrev msgc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "messages clear" : "msgc")<CR>
-" ----------------------------------------}}}
-
-"# help close ----------------------------------------{{{
-cnoreabbrev hc <C-r>=(getcmdtype()==#':' && getcmdpos()==#0 ? "helpc" : "hc")<CR>
-" ----------------------------------------}}}
-
-"# toggle number and relative number ----------------------------------------{{{
-command! Nu :set nu!<CR>
-command! Rnu :set rnu!<CR>
-" ----------------------------------------}}}
-
-"# toggle list ----------------------------------------{{{
-command! List :set list!<CR>
-" ----------------------------------------}}}
-
-" ----------------------------------------}}}
-
-
-"========================
-"      Key Mappings      
-"========================
-" ----------------------------------------{{{
-"command! WipeReg for i in range(34,122) | silent! call setreg(nr2char(i), []) | endfor
-"autocmd FileType vim nnoremap <buffer> <F11> :source %<CR>
-
-
-"# linewise vertical motion (if &warp=1) ----------------------------------------{{{
-noremap <Up> gk
-noremap <Down> gj
-noremap j gj
-noremap k gk
-" ----------------------------------------}}}
-
-"# buffers ----------------------------------------{{{
-"delete buffer without closing window (using ctrlpvim/ctrlp.vim plugin) 
-nnoremap <F10> :BD<CR>
-nnoremap <C-F10> :BD!<CR>
-
-"delete buffer
-nnoremap <Leader><F10> :bd<CR>
-nnoremap <Leader><C-F10> :bd!<CR>
-
-"next/prev buffer
-nnoremap \ :bn<CR>
-nnoremap <C-\> :bp<CR>
-" ----------------------------------------}}}
-"
-"# edit vimrc or resource vimrc ----------------------------------------{{{
-nnoremap <expr> <F12> &filetype ==# 'vim' ? ":source %<CR>" : ":edit $MYVIMRC<CR>"
-" ----------------------------------------}}}
-
-"# create/delete terminal emulator buffer ----------------------------------------{{{
-"create terminal buffer and cd to current directory
-"delete terminal buffer by using qpkorr/vim-bufkill plugin to retain the window
-nnoremap <expr> <F3> &buftype ==# 'terminal' ? ":BD!<CR>" : ":cd %:p:h<CR>:terminal<CR>i"
-nnoremap <expr> <Leader><F3> &buftype ==# 'terminal' ? ":bd!<CR>" : ":cd %:p:h<CR>:vsp<CR>:terminal<CR>i"
-nnoremap <C-F3> :terminal<CR>
-
-tnoremap <F3> <C-\><C-n>:BD!<CR>
-tnoremap <Leader><F3> <C-\><C-n>:bd!<CR>
-" ----------------------------------------}}}
-
-"# navigate errors & close quickfix window ----------------------------------------{{{
-map <C-n> :cnext<CR>
-map <C-m> :cprevious<CR>
-nnoremap <leader>a :cclose<CR>
-" ----------------------------------------}}}
-
-"# escape to normal mode ----------------------------------------{{{
-inoremap <C-l> <Esc>
-vnoremap <C-l> <Esc>
-tnoremap <C-l> <C-\><C-n>
-" ----------------------------------------}}}
-
-"# omni completion ----------------------------------------{{{
-"auto close preview window
-"autocmd InsertLeave * if pumvisible() == 0|pclose|endif
-autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-
-"trigger omni completion
-inoremap <C-Space> <C-x><C-o>
-
-"omni completion navigation
-inoremap <expr> <C-j> pumvisible() ? '<C-n>' : '<C-j>'
-inoremap <expr> <C-k> pumvisible() ? '<C-p>' : '<C-k>'
-
-inoremap <expr> <C-d> pumvisible() ? "<C-n><C-n><C-n><C-n><C-n>" : "\<C-d>"
-inoremap <expr> <C-u> pumvisible() ? "<C-p><C-p><C-p><C-p><C-p>" : "\<C-u>"
-" ----------------------------------------}}}
-
-"# create one white space without leaving normal mode ----------------------------------------{{{
-nnoremap , a<space><Esc>
-nnoremap <C-,> i<space><Esc> 
-" ----------------------------------------}}}
-
-"# move next 'eow' and previous 'bow' ----------------------------------------{{{
-"nnoremap H <nop>
-"nnoremap L <nop>
-nnoremap <C-h> b
-nnoremap <C-l> e
-"nnoremap <C-S-h> B
-"nnoremap <C-S-l> E
-nnoremap <S-h> B
-nnoremap <S-l> E
-" ----------------------------------------}}}
-"
-"# extends 'j' and 'k's motion ----------------------------------------{{{
-nnoremap <C-j> 7j
-nnoremap <C-k> 7k
-" ----------------------------------------}}}
-"
-"# move to 'bol' and 'eol' ----------------------------------------{{{
-nnoremap <Leader>h ^
-nnoremap <Leader>l g_
-nnoremap <Leader><S-h> 0
-nnoremap <Leader><S-l> $
-" ----------------------------------------}}}
-
-"# character deletion in insert mode ----------------------------------------{{{
-"delete word after cursor (simlar to <C-w>, delete word before cursor>
-inoremap <C-e> <C-o>de
-
-"reverse backspace
-inoremap <C-d> <C-o>x
-
-"remark: <C-o> escapes to do one normal-mode command, and then return to the insert mode
-" ----------------------------------------}}}
-
-"# reverse delete character ----------------------------------------{{{
-inoremap <C-BS> <Right><BS>
-" ----------------------------------------}}}
-
-"# delete line without deleting 'eol' ----------------------------------------{{{
-nnoremap dD 0d$
-" ----------------------------------------}}}
-
-"# yank until the end of the line ----------------------------------------{{{
-nnoremap Y y$
-" ----------------------------------------}}}
-
-"# yank current line to next/previous line ----------------------------------------{{{
-"nnoremap <C-y> ddp
-"nnoremap <C-S-Y> ddkP
-"nnoremap <C-S-y> ddkP
-"nnoremap <C-\> ddp 
-"nnoremap <C-S-\> ddkP 
-" ----------------------------------------}}}
-
-"# carriage return ----------------------------------------{{{
-"nnoremap \ <CR>
-" ----------------------------------------}}}
-
-"# open line ----------------------------------------{{{
-nnoremap o o<Esc>
-nnoremap <S-o> O<Esc>
-"verbose nnoremap <C-o> o
-"verbose nnoremap <C-S-o> O
-" ----------------------------------------}}}
-
-"# wrap word with text object ----------------------------------------{{{
-nnoremap <Leader>[ viw<Esc>a]<Esc>bi[<Esc>E
-nnoremap <Leader>( viw<Esc>a)<Esc>bi(<Esc>E
-nnoremap <Leader>{ viw<Esc>a}<Esc>bi{<Esc>E
-nnoremap <Leader>< viw<Esc>a><Esc>bi<<Esc>E
-nnoremap <Leader>' viw<Esc>a'<Esc>bi'<Esc>E
-nnoremap <Leader>" viw<Esc>a"<Esc>bi"<Esc>E
-nnoremap <Leader>` viw<Esc>a`<Esc>bi`<Esc>E
-
-nnoremap <Leader><Leader>[ viW<Esc>a]<Esc>Bi[<Esc>E
-nnoremap <Leader><Leader>( viW<Esc>a)<Esc>Bi(<Esc>E
-nnoremap <Leader><Leader>{ viW<Esc>a}<Esc>Bi{<Esc>E
-nnoremap <Leader><Leader>< viW<Esc>a><Esc>Bi<<Esc>E
-nnoremap <Leader><Leader>' viW<Esc>a'<Esc>Bi'<Esc>E
-nnoremap <Leader><Leader>" viW<Esc>a"<Esc>Bi"<Esc>E
-nnoremap <Leader><Leader>` viW<Esc>a`<Esc>Bi`<Esc>E
-" ----------------------------------------}}}
-"
-"# wrap highlighted with text object ----------------------------------------{{{
-vnoremap <Leader>[ di[]<Esc>hp
-vnoremap <Leader>( di()<Esc>hp
-vnoremap <Leader>{ di{}<Esc>hp
-vnoremap <Leader>< di<lt>><Esc>hp
-vnoremap <Leader>' di''<Esc>hp
-vnoremap <Leader>" di""<Esc>hp
-vnoremap <Leader>` di``<Esc>hp
-" ----------------------------------------}}}
-"
-"# enable text-object selection without postion cursor inside text-object ----------------------------------------{{{
-onoremap i[ :<C-u>normal! f]vi[<CR>
-onoremap i( :<C-u>normal! f)vi(<CR>
-onoremap i{ :<C-u>normal! f}vi{<CR>
-onoremap i< :<C-u>normal! f>vi<<CR>
-onoremap i' :<C-u>normal! f'vi'<CR>
-onoremap i" :<C-u>normal! f"vi"<CR>
-onoremap i` :<C-u>normal! f`vi`<CR>
-
-onoremap I[ :<C-u>normal! F]vi[<CR>
-onoremap I( :<C-u>normal! F)vi(<CR>
-onoremap I{ :<C-u>normal! F}vi{<CR>
-onoremap I< :<C-u>normal! F>vi<<CR>
-onoremap I' :<C-u>normal! F'vi'<CR>
-onoremap I" :<C-u>normal! F"vi"<CR>
-onoremap I` :<C-u>normal! F`vi`<CR>
-" ----------------------------------------}}}
-
 " ----------------------------------------}}}
 
 
