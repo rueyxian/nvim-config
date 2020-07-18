@@ -272,8 +272,7 @@ let g:TList_WinWidth = 40
 "nnoremap <C-f> :Files!<CR>
 "nnoremap <C-f> :Files<CR>
 "inoremap <C-f> <Esc>:BLines!<CR>
-inoremap <C-f> <Esc>:BLines!<CR>
-
+inoremap <C-f> <Esc>:BLines!<CR> 
 nnoremap <C-f>  :call fzf#run(fzf#wrap({'dir': '~'}))
 
 " ----------------------------------------}}}
@@ -406,6 +405,21 @@ command! Rnu :set rnu!<CR>
 command! List :set list!<CR>
 " ----------------------------------------}}}
 
+"# get go file's path ----------------------------------------{{{
+autocmd FileType go cnoreabbrev <silent> gofilepath <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call GoFilePath()" : "gofilepath")<CR>
+function! GoFilePath()	
+	let l:srcPath = $GOPATH . "/src/"
+	if stridx(getcwd(), l:srcPath) ==# 0		"Check if srcPath is the substring of cwd and it's start from index 0
+		let l:gofilepath = getcwd()[strlen(l:srcPath):]
+		echom "clipboard copied: ". l:gofilepath
+		let @+ = 	l:gofilepath
+	else
+		echom "clipboard copy failed"
+	endif
+endfunction
+" ----------------------------------------}}}
+
+
 " ----------------------------------------}}}
 
 
@@ -502,8 +516,8 @@ nnoremap <C-k> 7k
 " ----------------------------------------}}}
 "
 "# move to 'bol' and 'eol' ----------------------------------------{{{
-nnoremap <C-l> :call NavigateEOL() <CR>
-nnoremap <C-h> :call NavigateBOL() <CR>
+nnoremap <silent> <C-l> :call NavigateEOL() <CR>
+nnoremap <silent> <C-h> :call NavigateBOL() <CR>
 
 function! NavigateEOL()	
 	let l:col1 = virtcol('.')
