@@ -410,8 +410,9 @@ command! List :set list!<CR>
 cnoreabbrev <silent> filepathfromhome <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call FilePath()" : "filepathfromhome")<CR>
 function! FilePath()	
 	if stridx(getcwd(), $HOME) ==# 0
-		let l:filepath = getcwd()[strlen($HOME):]
-		echom "clipboard copied: ". "~". l:filepath
+		let l:filepath = "~".getcwd()[strlen($HOME):]
+		echom "clipboard copied: ".l:filepath
+		let @+ = l:filepath
 	else
 		echom "clipboard copy failed"
 	endif
