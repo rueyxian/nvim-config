@@ -405,7 +405,21 @@ command! Rnu :set rnu!<CR>
 command! List :set list!<CR>
 " ----------------------------------------}}}
 
-"# get go file's path ----------------------------------------{{{
+
+"# get file path ----------------------------------------{{{
+cnoreabbrev <silent> filepathfromhome <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call FilePath()" : "filepathfromhome")<CR>
+function! FilePath()	
+	if stridx(getcwd(), $HOME) ==# 0
+		let l:filepath = getcwd()[strlen($HOME):]
+		echom "clipboard copied: ". "~". l:filepath
+	else
+		echom "clipboard copy failed"
+	endif
+endfunction
+" ----------------------------------------}}}
+
+
+"# get go file path ----------------------------------------{{{
 autocmd FileType go cnoreabbrev <silent> gofilepath <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call GoFilePath()" : "gofilepath")<CR>
 function! GoFilePath()	
 	let l:srcPath = $GOPATH . "/src/"
