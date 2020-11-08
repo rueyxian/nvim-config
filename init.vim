@@ -418,6 +418,19 @@ command! List :set list!<CR>
 " ----------------------------------------}}}
 
 
+"# repeat string ----------------------------------------{{{
+command! -nargs=+ RepeatStr call RepeatStr(<f-args>)
+
+function! RepeatStr(string, count)
+	if a:count =~ '\d'
+	call RepeatCharacterAtCursor(a:string, a:count)
+	else	
+		echom "second argument has to be an integer"
+	endif
+endfunc
+" ----------------------------------------}}}
+
+
 "# get file path ----------------------------------------{{{
 cnoreabbrev <silent> filepathfromhome <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call FilePath()" : "filepathfromhome")<CR>
 function! FilePath()	
