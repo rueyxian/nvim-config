@@ -418,10 +418,11 @@ command! List :set list!<CR>
 " ----------------------------------------}}}
 
 
-"# repeat string ----------------------------------------{{{
-command! -nargs=+ RepeatStr call RepeatStr(<f-args>)
+"# repeat character  ----------------------------------------{{{
+cnoreabbrev rpchar <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'RpChar' : 'rpchar')<CR>
+command! -nargs=+ RpChar call RepeatCharacter(<f-args>)
 
-function! RepeatStr(string, count)
+function! RepeatCharacter(string, count)
 	if a:count =~ '\d'
 	call RepeatCharacterAtCursor(a:string, a:count)
 	else	
