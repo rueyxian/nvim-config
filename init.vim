@@ -21,6 +21,7 @@ Plug 'qpkorr/vim-bufkill'
 "Plug 'SirVer/ultisnips'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+" Plug 'airblade/vim-rooter'
 
 "Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 
@@ -122,6 +123,7 @@ augroup END
 " ----------------------------------------}}}
 
 
+" ================================================================================
 "========================
 "      Color Scheme      
 "========================
@@ -147,36 +149,35 @@ colorscheme molokai
 "==============================
 " ----------------------------------------{{{
 
-"# CtrlPBuf as first mode ----------------------------------------{{{
-let g:ctrlp_cmd = 'CtrlPBuffer'
-" ----------------------------------------}}}
+" " CtrlPBuf as first mode 
+" let g:ctrlp_cmd = 'CtrlPBuffer'
 
-"# exit CtrlP 
-let g:ctrlp_prompt_mappings = { 
-	\	'PrtHistory(1)'     : ['<c-s-n>'],
-	\	'PrtExit()'         : ['<c-p>', '<esc>'],
-	\	}
+" " exit CtrlP 
+" let g:ctrlp_prompt_mappings = { 
+"   \	'PrtHistory(1)'     : ['<c-s-n>'],
+"   \	'PrtExit()'         : ['<c-p>', '<esc>'],
+"   \	}
 
-"# delete buffer in CtrlPBuf Mode ----------------------------------------{{{
-let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
+" " delete buffer in CtrlPBuf Mode 
+" let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
 
-func! MyCtrlPMappings()
-	" nnoremap <buffer> <silent> <C--> :call <sid>DeleteBuffer(0)<CR>
-	nnoremap <buffer> <silent> <C--> :call <sid>DeleteBuffer(1)<CR>
-endfunc
+" func! MyCtrlPMappings()
+"   " nnoremap <buffer> <silent> <C--> :call <sid>DeleteBuffer(0)<CR>
+"   nnoremap <buffer> <silent> <C--> :call <sid>DeleteBuffer(1)<CR>
+" endfunc
 
-func! s:DeleteBuffer(force)
-	 let line = getline('.')
-	 let bufid = line =~ '\[\d\+\*No Name\]$' ? str2nr(matchstr(line, '\d\+'))
-			 \ : fnamemodify(line[2:], ':p')
-	if a:force ==# 0 
-		execute "bd" bufid
-	else
-		 execute "bd!" bufid	
-	endif
-	 exec "norm \<F5>"
-endfunc 
-" ----------------------------------------}}}
+" func! s:DeleteBuffer(force)
+"    let line = getline('.')
+"    let bufid = line =~ '\[\d\+\*No Name\]$' ? str2nr(matchstr(line, '\d\+'))
+"        \ : fnamemodify(line[2:], ':p')
+"   if a:force ==# 0 
+"     execute "bd" bufid
+"   else
+"      execute "bd!" bufid	
+"   endif
+"    exec "norm \<F5>"
+" endfunc 
+
 
 " ----------------------------------------}}}
 
@@ -219,13 +220,13 @@ let g:NERDToggleCheckAllLines = 1
 "      scrooloose/nerdtree      
 "===============================
 " ----------------------------------------{{{
-cd $HOME/go/src
+" cd $HOME/go/src
 "autocmd StdinReadPre * let s:std_in=1
 "autocmd VimEnter * if argc() == 0 && !exists("s:std_in") | NERDTree | endif
 
-nnoremap <C-F2> :NERDTreeFind<CR>
 nnoremap <F2> :NERDTreeToggle<CR>
-cnoreabbrev NT <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'NERDTree' : 'NT')<CR>
+nnoremap <Leader><F2> :NERDTree<CR>
+cnoreabbrev nt <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'NERDTree' : 'nt')<CR>
 
 autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
@@ -256,36 +257,122 @@ let g:TList_WinWidth = 40
 
 "# select buffers
 " ----------------------------------------{{{
-"function! s:buflist()
-  "redir => ls
-  "silent ls
-  "redir END
-  "return split(ls, '\n')
-"endfunction
+function! s:buflist()
+	redir => ls
+	silent ls
+	redir END
+	return split(ls, '\n')
+endfunction
 
-"function! s:bufopen(e)
-  "execute 'buffer' matchstr(a:e, '^[ 0-9]*')
-"endfunction
+function! s:bufopen(e)
+	execute 'buffer' matchstr(a:e, '^[ 0-9]*')
+endfunction
 
-"nnoremap <silent> <Leader><Enter> :call fzf#run({
-"\   'source':  reverse(<sid>buflist()),
-"\   'sink':    function('<sid>bufopen'),
-"\   'options': '+m --bind ctrl-k:up,ctrl-j:down',
-"\   'down':    len(<sid>buflist()) + 2
-"\ })<CR>
+nnoremap <silent> <Leader><Enter> :call fzf#run({
+\   'source':  reverse(<sid>buflist()),
+\   'sink':    function('<sid>bufopen'),
+\   'options': '+m --bind ctrl-k:up,ctrl-j:down',
+\   'down':    len(<sid>buflist()) + 2
+\ })<CR>
 
-"nnoremap <silent> <Leader>p :call fzf#run({
-			"\	'source': 'rg --files --column --no-heading --hidden --follow --glob "!.git/*"', 'sink': 'e', 'down': '~30%', 'options': '--bind ctrl-o:up,ctrl-l:down'})<cr>
+nnoremap <silent> <Leader>p :call fzf#run({
+			\	'source': 'rg --files --column --no-heading --hidden --follow --glob "!.git/*"', 'sink': 'e', 'down': '~30%', 'options': '--bind ctrl-o:up,ctrl-l:down'})<cr>
 
 
 " ----------------------------------------}}}
 
 "# Open FZF search
-"nnoremap <C-f> :Files!<CR>
-"nnoremap <C-f> :Files<CR>
-"inoremap <C-f> <Esc>:BLines!<CR>
-inoremap <C-f> <Esc>:BLines!<CR> 
-nnoremap <C-f>  :call fzf#run(fzf#wrap({'dir': '~'}))
+nnoremap <C-f> :Files!<CR>
+nnoremap <C-f> :Files<CR>
+inoremap <C-f> <Esc>:BLines!<CR>
+nnoremap <C-p> :Buffers<CR>
+
+cnoreabbrev buf <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Buffers' : 'buf')<CR>
+cnoreabbrev fs <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Files' : 'fs')<CR>
+cnoreabbrev fshome <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Files ~' : 'fshome')<CR>
+cnoreabbrev fsdesk <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Files ~/Desktop' : 'fsdesk')<CR>
+cnoreabbrev fsgo <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Files ~/go/src/' : 'fsgo')<CR>
+
+" nnoremap <C-g> <Esc><Esc>:BCommits!<CR> 
+"
+" inoremap <C-f> <Esc>:BLines!<CR> 
+" nnoremap <C-f>  :call fzf#run(fzf#wrap({'dir': '~'}))
+
+
+" ============================================================
+"" This is the default extra key bindings
+" let g:fzf_action = {
+"   \ 'ctrl-t': 'tab split',
+"   \ 'ctrl-x': 'split',
+"   \ 'ctrl-v': 'vsplit' }
+
+
+" " Enable per-command history.
+" " CTRL-N and CTRL-P will be automatically bound to next-history and
+" " previous-history instead of down and up. If you don't like the change,
+" " explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
+" let g:fzf_history_dir = '~/.local/share/fzf-history'
+
+" map <C-f> :Files<CR>
+" map <leader>b :Buffers<CR>
+" nnoremap <leader>g :Rg<CR>
+" nnoremap <leader>t :Tags<CR>
+" nnoremap <leader>m :Marks<CR>
+
+
+" let g:fzf_tags_command = 'ctags -R'
+" " Border color
+" let g:fzf_layout = {'up':'~90%', 'window': { 'width': 0.8, 'height': 0.8,'yoffset':0.5,'xoffset': 0.5, 'highlight': 'Todo', 'border': 'sharp' } }
+
+" let $FZF_DEFAULT_OPTS = '--layout=reverse --info=inline'
+" let $FZF_DEFAULT_COMMAND="rg --files --hidden"
+
+
+" Customize fzf colors to match your color scheme
+let g:fzf_colors =
+\ { 'fg':      ['fg', 'Normal'],
+	\ 'bg':      ['bg', 'Normal'],
+	\ 'hl':      ['fg', 'Comment'],
+	\ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+	\ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+	\ 'hl+':     ['fg', 'Statement'],
+	\ 'info':    ['fg', 'PreProc'],
+	\ 'border':  ['fg', 'Ignore'],
+	\ 'prompt':  ['fg', 'Conditional'],
+	\ 'pointer': ['fg', 'Exception'],
+	\ 'marker':  ['fg', 'Keyword'],
+	\ 'spinner': ['fg', 'Label'],
+	\ 'header':  ['fg', 'Comment'] }
+
+" "Get Files
+" command! -bang -nargs=? -complete=dir Files
+"     \ call fzf#vim#files(<q-args>, fzf#vim#with_preview({'options': ['--layout=reverse', '--info=inline']}), <bang>0)
+
+
+" Get text in files with Rg
+command! -bang -nargs=* Rg
+	\ call fzf#vim#grep(
+	\   'rg --column --line-number --no-heading --color=always --smart-case '.shellescape(<q-args>), 1,
+	\   fzf#vim#with_preview(), <bang>0)
+
+" Ripgrep advanced
+function! RipgrepFzf(query, fullscreen)
+	let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case %s || true'
+	let initial_command = printf(command_fmt, shellescape(a:query))
+	let reload_command = printf(command_fmt, '{q}')
+	let spec = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
+	call fzf#vim#grep(initial_command, 1, fzf#vim#with_preview(spec), a:fullscreen)
+endfunction
+
+command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+
+" Git grep
+command! -bang -nargs=* GGrep
+	\ call fzf#vim#grep(
+	\   'git grep --line-number '.shellescape(<q-args>), 0,
+	\   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
+
+
 
 " ----------------------------------------}}}
 
@@ -386,6 +473,7 @@ endfunction
 
 
 
+" ================================================================================
 "====================
 "      Commands      
 "====================
@@ -419,8 +507,8 @@ command! List :set list!<CR>
 
 
 "# repeat character  ----------------------------------------{{{
-cnoreabbrev rpchar <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'RpChar' : 'rpchar')<CR>
-command! -nargs=+ RpChar call RepeatCharacter(<f-args>)
+cnoreabbrev rpc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'RpC' : 'rpc')<CR>
+command! -nargs=+ RpC call RepeatCharacter(<f-args>)
 
 function! RepeatCharacter(string, count)
 	if a:count =~ '\d'
@@ -480,12 +568,9 @@ noremap k gk
 " ----------------------------------------}}}
 
 "# buffers ----------------------------------------{{{
-"delete buffer without closing window (using ctrlpvim/ctrlp.vim plugin) 
-" nnoremap <F10> :BD<CR>
-nnoremap <F10> :BD!<CR>
 
 "delete buffer
-" nnoremap <Leader><F10> :bd<CR>
+nnoremap <F10> :BD!<CR>
 nnoremap <Leader><F10> :bd!<CR>
 
 "next/prev buffer
@@ -506,6 +591,7 @@ nnoremap <C-F3> :terminal<CR>
 
 tnoremap <F3> <C-\><C-n>:BD!<CR>
 tnoremap <Leader><F3> <C-\><C-n>:bd!<CR>
+
 " ----------------------------------------}}}
 
 "# navigate errors & close quickfix window ----------------------------------------{{{
@@ -577,48 +663,16 @@ function! NavigateBOL()
 		execute "normal! 0"
 	endif
 endfunction
-
-" nnoremap <Leader>h ^
-" nnoremap <Leader>l g_
-" nnoremap <Leader><S-h> 0
-" nnoremap <Leader><S-l> $
 " ----------------------------------------}}}
 
-"# character deletion in insert mode ----------------------------------------{{{
-"delete word after cursor (simlar to <C-w>, delete word before cursor>
-inoremap <C-e> <C-o>de
-
-"reverse backspace
-inoremap <C-BS> <C-o>x
-
-"remark: <C-o> escapes to do one normal-mode command, and then return to the insert mode
-" ----------------------------------------}}}
 
 "# delete line without deleting 'eol' ----------------------------------------{{{
 nnoremap dD 0d$
 " ----------------------------------------}}}
 
-"# yank until the end of the line ----------------------------------------{{{
-nnoremap Y y$
-" ----------------------------------------}}}
-
-"# yank current line to next/previous line ----------------------------------------{{{
-"nnoremap <C-y> ddp
-"nnoremap <C-S-Y> ddkP
-"nnoremap <C-S-y> ddkP
-"nnoremap <C-\> ddp 
-"nnoremap <C-S-\> ddkP 
-" ----------------------------------------}}}
-
-"# create space without leaving normal mode ----------------------------------------{{{
-nnoremap <C-Space> a<Space><Esc>
-" ----------------------------------------}}}
-
 "# open line ----------------------------------------{{{
 nnoremap o o<Esc>
 nnoremap <S-o> O<Esc>
-"verbose nnoremap <C-o> o
-"verbose nnoremap <C-S-o> O
 " ----------------------------------------}}}
 
 "# wrap word with text object ----------------------------------------{{{
@@ -670,18 +724,21 @@ onoremap I` :<C-u>normal! F`vi`<CR>
 " ----------------------------------------}}}
 
 
+" ================================================================================
 "=======================
 "      Fold Marker      
 "=======================
 " ----------------------------------------{{{
 augroup foldMarker
 	autocmd!
-
 	autocmd FileType vim setlocal foldmethod=marker 
 	autocmd FileType vim setlocal foldmarker={{{,}}}
 
-	autocmd FileType vim nnoremap <buffer> <Leader>fm{ :call AddFoldMarkerOpen()<CR>
-	autocmd FileType vim nnoremap <buffer> <Leader>fm} :call AddFoldMarkerClose()<CR>
+	autocmd FileType vim command! FoldOpen call AddFoldMarkerOpen()<CR>
+	cnoreabbrev foldopen <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'FoldOpen' : 'foldopen')<CR>
+
+	autocmd FileType vim command! FoldClose call AddFoldMarkerClose()<CR>
+	cnoreabbrev foldclose <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'FoldClose' : 'foldclose')<CR>
 augroup END
 
 function! AddFoldMarkerOpen()
@@ -701,12 +758,14 @@ function! AddFoldMarkerClose()
 endfunction
 " ----------------------------------------}}}
 
-
 "=========================
 "      BoxifyComment      
 "=========================
 " ----------------------------------------{{{
-nnoremap <leader>box :call BoxifyComment()<CR>
+
+command! Boxify call BoxifyComment()<CR>
+cnoreabbrev boxify <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Boxify' : 'boxify')<CR>
+" nnoremap <leader>box :call BoxifyComment()<CR>
 function! BoxifyComment()
 	call UncommentIfNot()
 	call RemoveLeadingWhiteSpace()
@@ -736,7 +795,7 @@ endfunction
 " ----------------------------------------}}}
 
 
-"============================
+" ============================
 "      Helper Functions      
 "============================
 " ----------------------------------------{{{
