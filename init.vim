@@ -16,7 +16,7 @@ Plug 'morhetz/gruvbox'
 Plug 'scrooloose/nerdcommenter'
 Plug 'scrooloose/nerdtree'
 
-Plug 'ctrlpvim/ctrlp.vim'
+" Plug 'ctrlpvim/ctrlp.vim'
 Plug 'qpkorr/vim-bufkill'
 "Plug 'SirVer/ultisnips'
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -26,8 +26,10 @@ Plug 'junegunn/fzf.vim'
 "Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
 
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
+Plug 'pangloss/vim-javascript'
 
 Plug 'mattn/emmet-vim'
+Plug 'elzr/vim-json'
 
 
 call plug#end()
@@ -49,7 +51,7 @@ set softtabstop=2
 set shiftwidth=2
 set autoindent
 "set expandtab
-"set smartindent
+set smartindent
 set ruler
 set number
 set relativenumber
@@ -119,6 +121,15 @@ augroup changeDirCurr
 	"auto change directory to current buffer (exclude terminal type)
 	autocmd BufCreate,BufEnter * if &buftype !=# 'terminal'| lcd %:p:h  | endif
 augroup END	
+
+
+"# auto indent 
+autocmd  BufRead,BufWritePre *.sh,*.html,*.gohtml :call AutoIndent() 
+function! AutoIndent()
+	let save_pos = getpos(".")
+	normal gg=G
+	call setpos(".", save_pos)
+endfunction
 
 " ----------------------------------------}}}
 
@@ -194,7 +205,7 @@ map <C-_> <plug>NERDCommenterToggle
 let g:NERDSpaceDelims = 1
 
 " Use compact syntax for prettified multi-line comments
-" let g:NERDCompactSexyComs = 1
+let g:NERDCompactSexyComs = 1
 
 " Align line-wise comment delimiters flush left instead of following code indentation
 let g:NERDDefaultAlign = 'left'
@@ -244,8 +255,7 @@ let g:TList_WinWidth = 40
 "========================
 "      junegunn/fzf      
 "========================
-" ----------------------------------------{{{
- "Open files in horizontal split
+" ----------------------------------------{{{ Open files in horizontal split
 "noremap <silent> <Leader>s :call fzf#run({
 "\   'down': '40%',
 "\   'sink': 'botright split' })<CR>
@@ -381,6 +391,9 @@ command! -bang -nargs=* GGrep
 "      fatih/vim-go      
 "========================
 " ----------------------------------------{{{
+"gohtml syntax highlighting
+au BufRead,BufNewFile *.gohtml set filetype=gohtmltmpl
+
 let g:go_fmt_command = "goimports"
 let g:go_autodetect_gopath = 1
 let g:go_list_type = "quickfix"
@@ -461,6 +474,62 @@ function! s:build_go_files()
   endif
 endfunction 
 " ----------------------------------------}}}
+
+"===================================
+"      pangloss/vim-javascript      
+"===================================
+" ----------------------------------------{{{
+let g:javascript_plugin_jsdoc = 1
+let g:javascript_plugin_ngdoc = 1
+let g:javascript_plugin_flow = 1
+
+" augroup javascript_folding
+"     au!
+"     au FileType javascript setlocal foldmethod=syntax
+" augroup END
+
+" let g:javascript_conceal_function             = "ƒ"
+" let g:javascript_conceal_null                 = "ø"
+" let g:javascript_conceal_this                 = "@"
+" let g:javascript_conceal_return               = "⇚"
+" let g:javascript_conceal_undefined            = "¿"
+" let g:javascript_conceal_NaN                  = "ℕ"
+" let g:javascript_conceal_prototype            = "¶"
+" let g:javascript_conceal_static               = "•"
+" let g:javascript_conceal_super                = "Ω"
+" let g:javascript_conceal_arrow_function       = "⇒"
+" let g:javascript_conceal_noarg_arrow_function = "🞅"
+" let g:javascript_conceal_underscore_arrow_function = "🞅"
+
+" ----------------------------------------}}}
+
+
+"===========================
+"      mattn/emmet-vim      
+"===========================
+" ----------------------------------------{{{
+" let g:user_emmet_leader_key='<C-Y>'
+" ----------------------------------------}}}
+
+
+
+"=========================
+"      elzr/vim-json      
+"=========================
+" ----------------------------------------{{{
+au! BufRead,BufNewFile *.json set filetype=json
+augroup json_autocmd
+  autocmd!
+  autocmd FileType json set autoindent
+  autocmd FileType json set formatoptions=tcq2l
+  autocmd FileType json set textwidth=78 shiftwidth=2
+  autocmd FileType json set softtabstop=2 tabstop=2
+	autocmd FileType json set expandtab
+	autocmd FileType json set foldmethod=manual
+augroup END
+" ----------------------------------------}}}
+
+
 
 
 "=============================
