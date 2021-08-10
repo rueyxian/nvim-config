@@ -27,7 +27,10 @@ Plug 'junegunn/fzf.vim'
 
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
 Plug 'pangloss/vim-javascript'
+Plug 'moll/vim-node'
+" Plug 'turbio/bracey.vim'
 
+Plug 'ekalinin/dockerfile.vim'
 Plug 'mattn/emmet-vim'
 Plug 'elzr/vim-json'
 
@@ -517,13 +520,14 @@ let g:javascript_plugin_flow = 1
 "      elzr/vim-json      
 "=========================
 " ----------------------------------------{{{
+let g:vim_json_syntax_conceal = 0
 au! BufRead,BufNewFile *.json set filetype=json
 augroup json_autocmd
   autocmd!
-  autocmd FileType json set autoindent
-  autocmd FileType json set formatoptions=tcq2l
-  autocmd FileType json set textwidth=78 shiftwidth=2
-  autocmd FileType json set softtabstop=2 tabstop=2
+	autocmd FileType json set autoindent
+  " autocmd FileType json set formatoptions=tcq2l
+	autocmd FileType json set textwidth=78 shiftwidth=2
+  " autocmd FileType json set softtabstop=2 tabstop=2
 	autocmd FileType json set expandtab
 	autocmd FileType json set foldmethod=manual
 augroup END
@@ -572,6 +576,22 @@ command! Rnu :set rnu!<CR>
 
 "# toggle list ----------------------------------------{{{
 command! List :set list!<CR>
+" ----------------------------------------}}}
+
+
+"# toggle wrap & linebreak  ----------------------------------------{{{
+" command! -nargs=* Wrap :set wrap linebreak
+command! -nargs=* Wrap call WrapLinebreak()
+cnoreabbrev wrap <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Wrap' : 'wrap')<CR>
+
+func! WrapLinebreak()
+	set wrap!
+	if &wrap ==# 1
+		set linebreak
+	else
+		set nolinebreak
+	endif
+endfunc
 " ----------------------------------------}}}
 
 
@@ -629,11 +649,15 @@ endfunction
 "autocmd FileType vim nnoremap <buffer> <F11> :source %<CR>
 
 
-"# linewise vertical motion (if &warp=1) ----------------------------------------{{{
-noremap <Up> gk
-noremap <Down> gj
-noremap j gj
-noremap k gk
+"# linewise motion (if &warp=1) ----------------------------------------{{{
+noremap <expr> <Up> &wrap ==# 1 ? "gj" : "j"
+noremap <expr> <Down> &wrap ==# 1 ? "gk" : "k"
+noremap <expr> j &wrap ==# 1 ? "gj" : "j"
+noremap <expr> k &wrap ==# 1 ? "gk" : "k"
+
+noremap <expr> $ &wrap ==# 1 ? "g$" : "$"
+noremap <expr> ^ &wrap ==# 1 ? "g^" : "^"
+noremap <expr> 0 &wrap ==# 1 ? "g0" : "0"
 " ----------------------------------------}}}
 
 "# buffers ----------------------------------------{{{
@@ -697,15 +721,6 @@ inoremap <expr> <C-u> pumvisible() ? "<C-p><C-p><C-p><C-p><C-p>" : "<C-u>"
 inoremap <expr> <CR> pumvisible() ? "<C-y>" : "<CR>"
 " ----------------------------------------}}}
 
-"# move next 'eow' and previous 'bow' ----------------------------------------{{{
-" nnoremap <C-h> b
-" nnoremap <C-l> e
-" "nnoremap <C-S-h> B
-" "nnoremap <C-S-l> E
-" nnoremap <S-h> B
-" nnoremap <S-l> E
-" ----------------------------------------}}}
-"
 "# extends 'j' and 'k's motion ----------------------------------------{{{
 nnoremap <C-j> 7j
 nnoremap <C-k> 7k
@@ -717,19 +732,36 @@ nnoremap <silent> <C-h> :call NavigateBOL() <CR>
 
 function! NavigateEOL()	
 	let l:col1 = virtcol('.')
-	execute "normal! g_"
+	if &wrap ==# 1
+		"combination of g$ and ge, because gg_ won't work
+		execute "normal! g$ge"
+	else
+		execute "normal! g_"
+	endif
 	let l:col2 	= virtcol('.') 
 	if l:col1 ==# l:col2 
-		execute "normal! $"
+		if &wrap ==# 1
+			execute "normal! g$"
+		else
+			execute "normal! $"
+		endif
 	endif
 endfunction
 
 function! NavigateBOL()	
 	let l:col1 = virtcol('.')
-	execute "normal! ^"
+	if &wrap ==# 1
+		execute "normal! g^"
+	else
+		execute "normal! ^"
+	endif
 	let l:col2 	= virtcol('.') 
 	if l:col1 ==# l:col2 
-		execute "normal! 0"
+		if &wrap ==#1
+			execute "normal! g0"
+		else
+			execute "normal! 0"
+		endif
 	endif
 endfunction
 " ----------------------------------------}}}
