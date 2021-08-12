@@ -588,8 +588,10 @@ func! WrapLinebreak()
 	set wrap!
 	if &wrap ==# 1
 		set linebreak
+		echom "set wrap & linebreak"
 	else
 		set nolinebreak
+		echom "set nowrap & nolinebreak"
 	endif
 endfunc
 " ----------------------------------------}}}
@@ -655,9 +657,15 @@ noremap <expr> <Down> &wrap ==# 1 ? "gk" : "k"
 noremap <expr> j &wrap ==# 1 ? "gj" : "j"
 noremap <expr> k &wrap ==# 1 ? "gk" : "k"
 
-noremap <expr> $ &wrap ==# 1 ? "g$" : "$"
-noremap <expr> ^ &wrap ==# 1 ? "g^" : "^"
-noremap <expr> 0 &wrap ==# 1 ? "g0" : "0"
+nnoremap <silent> 0 :call NavStartLine('n') <CR>
+nnoremap <silent> ^ :call NavStartLineNonBlank('n') <CR>
+nnoremap <silent> $ :call NavEndLine('n') <CR>
+nnoremap <silent> g_ :call NavEndLineNonBlank('n') <CR>
+
+xnoremap <silent> 0 :call NavStartLine('x') <CR>
+xnoremap <silent> ^ :call NavStartLineNonBlank('x') <CR>
+xnoremap <silent> $ :call NavEndLine('x') <CR>
+xnoremap <silent> g_ :call NavEndLineNonBlank('x') <CR>
 " ----------------------------------------}}}
 
 "# buffers ----------------------------------------{{{
@@ -694,9 +702,9 @@ nnoremap <leader>a :cclose<CR>
 " ----------------------------------------}}}
 
 "# escape to normal mode ----------------------------------------{{{
-inoremap <C-l> <Esc>
-vnoremap <C-l> <Esc>
-tnoremap <C-l> <C-\><C-n>
+inoremap <C-Space> <Esc>
+vnoremap <C-Space> <Esc>
+tnoremap <C-Space> <C-\><C-n>
 " ----------------------------------------}}}
 
 "# omni completion ----------------------------------------{{{
@@ -705,7 +713,7 @@ autocmd InsertLeave * if pumvisible() == 0|pclose|endif
 autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
 
 "toggle omni completion
-inoremap <expr> <C-Space> pumvisible() ? "<C-e>" : "<C-x><C-o>"
+inoremap <expr> <C-o> pumvisible() ? "<C-e>" : "<C-x><C-o>"
 
 " open omni completion menu closing previous if open and opening new menu without changing the text
 " inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') .
@@ -726,44 +734,96 @@ nnoremap <C-j> 7j
 nnoremap <C-k> 7k
 " ----------------------------------------}}}
 "
-"# move to 'bol' and 'eol' ----------------------------------------{{{
-nnoremap <silent> <C-l> :call NavigateEOL() <CR>
-nnoremap <silent> <C-h> :call NavigateBOL() <CR>
+"# navigate cursor to 'sol' and 'eol' ----------------------------------------{{{
+nnoremap <silent> <C-h> :call NavStartLineToggle('n') <CR>
+nnoremap <silent> <C-l> :call NavEndLineToggle('n') <CR>
 
-function! NavigateEOL()	
-	let l:col1 = virtcol('.')
-	if &wrap ==# 1
-		"combination of g$ and ge, because gg_ won't work
-		execute "normal! g$ge"
-	else
-		execute "normal! g_"
+xnoremap <silent> <C-h> :call NavStartLineToggle('x') <CR>
+xnoremap <silent> <C-l> :call NavEndLineToggle('x') <CR>
+
+function! NavStartLine(mode)
+	if a:mode == 'n' || a:mode == 'x'
+		if a:mode == 'x'
+			execute "normal! gv"
+		endif
+		if &wrap ==# 1
+				execute "normal! g0"
+		else
+				execute "normal! 0"
+		endif
 	endif
-	let l:col2 	= virtcol('.') 
-	if l:col1 ==# l:col2 
+endfunc
+
+function! NavStartLineNonBlank(mode)
+	if a:mode == 'n' || a:mode == 'x'
+		if a:mode == 'x'
+			execute "normal! gv"
+		endif
+		if &wrap ==# 1
+				execute "normal! g^"
+		else
+				execute "normal! ^"
+		endif
+	endif
+endfunc
+
+function! NavEndLine(mode)
+	if a:mode == 'n' || a:mode == 'x'
+		if a:mode == 'x'
+			execute "normal! gv"
+		endif
 		if &wrap ==# 1
 			execute "normal! g$"
 		else
 			execute "normal! $"
 		endif
 	endif
-endfunction
+endfunc
 
-function! NavigateBOL()	
-	let l:col1 = virtcol('.')
-	if &wrap ==# 1
-		execute "normal! g^"
-	else
-		execute "normal! ^"
-	endif
-	let l:col2 	= virtcol('.') 
-	if l:col1 ==# l:col2 
-		if &wrap ==#1
-			execute "normal! g0"
+function! NavEndLineNonBlank(mode)
+	if a:mode == 'n' || a:mode == 'x'
+		if a:mode == 'x'
+			execute "normal! gv"
+		endif
+		if &wrap ==# 1
+			"simple gg_ command won't work"
+			execute "normal! g$"
+			if CursorCharacter() =~ "\\s"
+				execute "normal! ge"
+			endif
 		else
-			execute "normal! 0"
+			execute "normal! g_"
 		endif
 	endif
-endfunction
+endfunc
+
+function! NavStartLineToggle(mode)
+	if a:mode == 'n' || a:mode == 'x'
+		if a:mode == 'x'
+			execute "normal! gv"
+		endif
+		let l:col1 = virtcol('.')
+			call NavStartLineNonBlank(a:mode)	
+		let l:col2 	= virtcol('.') 
+		if l:col1 ==# l:col2 
+			call NavStartLine(a:mode)	
+		endif
+	endif
+endfunc
+
+function! NavEndLineToggle(mode)
+	if a:mode == 'n' || a:mode == 'x'
+		if a:mode == 'x'
+			execute "normal! gv"
+		endif
+		let l:col1 = virtcol('.')
+			call NavEndLineNonBlank(a:mode)
+		let l:col2 	= virtcol('.') 
+		if l:col1 ==# l:col2 
+			call NavEndLine(a:mode)
+		endif
+	endif
+endfunc
 " ----------------------------------------}}}
 
 
