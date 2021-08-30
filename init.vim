@@ -157,44 +157,6 @@ let NERDTreeIgnore = ['_site']
 colorscheme molokai
 " ----------------------------------------}}}
 
-
-"==============================
-"      ctrlpvim/ctrlp.vim      
-"==============================
-" ----------------------------------------{{{
-
-" " CtrlPBuf as first mode 
-" let g:ctrlp_cmd = 'CtrlPBuffer'
-
-" " exit CtrlP 
-" let g:ctrlp_prompt_mappings = { 
-"   \	'PrtHistory(1)'     : ['<c-s-n>'],
-"   \	'PrtExit()'         : ['<c-p>', '<esc>'],
-"   \	}
-
-" " delete buffer in CtrlPBuf Mode 
-" let g:ctrlp_buffer_func = { 'enter': 'MyCtrlPMappings' }
-
-" func! MyCtrlPMappings()
-"   " nnoremap <buffer> <silent> <C--> :call <sid>DeleteBuffer(0)<CR>
-"   nnoremap <buffer> <silent> <C--> :call <sid>DeleteBuffer(1)<CR>
-" endfunc
-
-" func! s:DeleteBuffer(force)
-"    let line = getline('.')
-"    let bufid = line =~ '\[\d\+\*No Name\]$' ? str2nr(matchstr(line, '\d\+'))
-"        \ : fnamemodify(line[2:], ':p')
-"   if a:force ==# 0 
-"     execute "bd" bufid
-"   else
-"      execute "bd!" bufid	
-"   endif
-"    exec "norm \<F5>"
-" endfunc 
-
-
-" ----------------------------------------}}}
-
 "===================================
 "      scrooloose/nerdcommeter      
 "===================================
@@ -385,8 +347,6 @@ command! -bang -nargs=* GGrep
 	\   'git grep --line-number '.shellescape(<q-args>), 0,
 	\   fzf#vim#with_preview({'dir': systemlist('git rev-parse --show-toplevel')[0]}), <bang>0)
 
-
-
 " ----------------------------------------}}}
 
 
@@ -407,6 +367,8 @@ let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
 let g:go_highlight_extra_types = 1
 let g:go_highlight_generate_tags = 1
+
+let g:go_updatetime = 250
 
 " Open :GoDeclsDir with ctrl-g
 nmap <C-g> :GoDeclsDir<cr>
@@ -464,6 +426,13 @@ augroup go
   autocmd Filetype go command! -bang AV call go#alternate#Switch(<bang>0, 'vsplit')
   autocmd Filetype go command! -bang AS call go#alternate#Switch(<bang>0, 'split')
   autocmd Filetype go command! -bang AT call go#alternate#Switch(<bang>0, 'tabe')
+
+	" :GoSameIdsAutoToggle
+	autocmd FileType go cnoreabbrev gohl <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'GoSameIdsAutoToggle' : 'gohl')<CR>
+	autocmd FileType go cnoreabbrev gotype <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "GoAutoTypeInfo" : "gotype")<CR>
+" cnoreabbrev <silent> filepathfromhome <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call FilePath()" : "filepathfromhome")<CR>
+" function! FilePath()	
+
 augroup END
 
 " build_go_files is a custom function that builds or compiles the test file.
@@ -476,6 +445,106 @@ function! s:build_go_files()
     call go#cmd#Build(0)
   endif
 endfunction 
+
+
+
+function! s:newHandlerState(statustype) abort
+  let l:state = {
+        \ 'winid': win_getid(winnr()),
+        \ 'statustype': a:statustype,
+        \ 'jobdir': getcwd(),
+        \ 'handleResult': funcref('s:noop'),
+      \ }
+
+  " explicitly bind requestComplete to state so that within it, self will
+  " always refer to state. See :help Partial for more information.
+  let l:state.requestComplete = funcref('s:requestComplete', [], l:state)
+
+  " explicitly bind start to state so that within it, self will
+  " always refer to state. See :help Partial for more information.
+  let l:state.start = funcref('s:start', [], l:state)
+
+  return l:state
+endfunction
+
+
+" ================================================================================
+
+cnoreabbrev <silent> goiferr <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call GoIfErr()" : "goiferr")<CR>
+func! GoIfErr()
+	let l:goinfo = go#complete#GetInfo()
+
+	" ==================================================
+	let l:varPattern = '[a-zA-Z0-9\*\._\[\]\{\}\ ]\+'
+	let l:errPattern = '\([a-zA-Z0-9_]\+ \)\?error'
+
+	let l:varsCommaPattern = '\(\('.l:varPattern.', \)*'.l:varPattern.'\)\?'		
+
+	" ===============
+	let l:funcPattern = 'func \(('.l:varPattern.').\)\?[a-zA-Z0-9]\+'
+	let l:argsPattern = '('.l:varsCommaPattern.')'
+
+	let l:sretPattern = '\(error\|('.l:errPattern.')\)'
+	let l:mretPattern = '(\('.l:varPattern.', \)*'.l:errPattern.'\(, '.l:varsCommaPattern.'\)\?)'
+
+	" ===============
+	let l:sglRetPattern = '^'.l:funcPattern.l:argsPattern.' '.l:sretPattern.'$'
+	let l:mulRetPattern = '^'.l:funcPattern.l:argsPattern.' '.l:mretPattern.'$'
+
+	" ==================================================
+	" check if it's a valid func signature
+	if (l:goinfo !~# l:sglRetPattern) && (l:goinfo !~# l:mulRetPattern)
+		echom "failed to generate if-error statement"
+		return
+	endif
+
+	" ==================================================
+	" check if it's a method/function with single return (error)
+	if l:goinfo =~# l:sglRetPattern 
+		execute "normal! ^iif err := \<ESC>g_a; err != nil {\<ESC>"
+		execute "normal! opanic(err)\<ESC>"
+		execute "normal! o}\<ESC>"	
+		return
+	endif
+
+	" ==================================================
+	" method/function with multiple return
+	let l:lpIdxs = s:matches(l:goinfo, '(')
+	let l:rpIdxs = s:matches(l:goinfo, ')')
+	let l:lpIdx = l:lpIdxs[len(l:lpIdxs) - 1]
+	let l:rpIdx = l:rpIdxs[len(l:rpIdxs) - 1]
+	let l:retsStr = l:goinfo[lpIdx + 1:rpIdx - 1]
+
+	" ===============
+	let l:rettypes = []
+	for l:retstr in split(l:retsStr, ",")
+		let l:ret = split(l:retstr, " ")
+		let l:type = l:ret[len(l:ret) - 1]
+		let l:type = substitute(l:type, " ", "","")
+		let l:rettypes = add(l:rettypes, l:type)
+	endfor
+
+	" ===============
+	let l:num = 0
+	execute "normal! ^\<ESC>"
+	for l:rettype in l:rettypes
+		if l:rettype !=# "error"
+			execute "normal! iv". l:num. ", \<ESC>l"		
+			let l:num += 1	
+			continue
+		endif
+		execute "normal! ierr, \<ESC>l"		
+	endfor
+
+	execute "normal! hhs := "		
+	execute "normal oiif err != nil {\<ESC>"
+	execute "normal! opanic(err)\<ESC>"
+	execute "normal! o}\<ESC>"	
+
+endfunction
+
+" ================================================================================
+
 " ----------------------------------------}}}
 
 "===================================
@@ -514,8 +583,6 @@ let g:javascript_plugin_flow = 1
 " let g:user_emmet_leader_key='<C-Y>'
 " ----------------------------------------}}}
 
-
-
 "=========================
 "      elzr/vim-json      
 "=========================
@@ -533,9 +600,6 @@ augroup json_autocmd
 augroup END
 " ----------------------------------------}}}
 
-
-
-
 "=============================
 "      neoclide/coc.nvim      
 "=============================
@@ -543,10 +607,6 @@ augroup END
 "
 " ----------------------------------------}}}
 
-
-
-
-" ================================================================================
 "====================
 "      Commands      
 "====================
@@ -599,11 +659,11 @@ endfunc
 
 "# repeat character  ----------------------------------------{{{
 cnoreabbrev rpc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'RpC' : 'rpc')<CR>
-command! -nargs=+ RpC call RepeatCharacter(<f-args>)
+command! -nargs=+ RpC call <SID>RepeatCharacter(<f-args>)
 
-function! RepeatCharacter(string, count)
+function! s:RepeatCharacter(string, count)
 	if a:count =~ '\d'
-	call RepeatCharacterAtCursor(a:string, a:count)
+	call s:RepeatCharacterAtCursor(a:string, a:count)
 	else	
 		echom "second argument has to be an integer"
 	endif
@@ -612,8 +672,8 @@ endfunc
 
 
 "# get file path ----------------------------------------{{{
-cnoreabbrev <silent> filepathfromhome <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call FilePath()" : "filepathfromhome")<CR>
-function! FilePath()	
+cnoreabbrev <silent> filepathfromhome <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call <SID>FilePath()" : "filepathfromhome")<CR>
+function! s:FilePath()	
 	if stridx(getcwd(), $HOME) ==# 0
 		let l:filepath = "~".getcwd()[strlen($HOME):]
 		echom "clipboard copied: ".l:filepath
@@ -624,20 +684,35 @@ function! FilePath()
 endfunction
 " ----------------------------------------}}}
 
-
 "# get go file path ----------------------------------------{{{
-autocmd FileType go cnoreabbrev <silent> gofilepath <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call GoFilePath()" : "gofilepath")<CR>
-function! GoFilePath()	
-	let l:srcPath = $GOPATH . "/src/"
-	if stridx(getcwd(), l:srcPath) ==# 0		"Check if srcPath is the substring of cwd and it's start from index 0
-		let l:gofilepath = getcwd()[strlen(l:srcPath):]
-		echom "clipboard copied: ". l:gofilepath
-		let @+ = 	l:gofilepath
-	else
-		echom "clipboard copy failed"
+" autocmd FileType go cnoreabbrev <silent> gofilepath <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call <SID>GoFilePath()" : "gofilepath")<CR>
+" function! s:GoFilePath()	
+"   let l:srcPath = $GOPATH . "/src/"
+"   if stridx(getcwd(), l:srcPath) ==# 0		"Check if srcPath is the substring of cwd and it's start from index 0
+"     let l:gofilepath = getcwd()[strlen(l:srcPath):]
+"     echom "clipboard copied: ". l:gofilepath
+"     let @+ = 	l:gofilepath
+"   else
+"     echom "clipboard copy failed"
+"   endif
+" endfunction
+" ----------------------------------------}}}
+
+"# copy last Nth messages to clipboard ----------------------------------------{{{
+cnoreabbrev <silent> copymsg <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'CopyMsg' : 'copymsg')<CR>
+command! -nargs=+ CopyMsg call <SID>CopyMessages(<f-args>)
+function! s:CopyMessages(num)	
+	if a:num !~# '^\d\+$'
+		echom "argument must be a number"
+		return
 	endif
+
+	execute "redir @+"	
+	execute a:num . "messages"
+	execute "redir END"
 endfunction
 " ----------------------------------------}}}
+
 
 
 " ----------------------------------------}}}
@@ -657,15 +732,15 @@ noremap <expr> <Down> &wrap ==# 1 ? "gk" : "k"
 noremap <expr> j &wrap ==# 1 ? "gj" : "j"
 noremap <expr> k &wrap ==# 1 ? "gk" : "k"
 
-nnoremap <silent> 0 :call NavStartLine('n') <CR>
-nnoremap <silent> ^ :call NavStartLineNonBlank('n') <CR>
-nnoremap <silent> $ :call NavEndLine('n') <CR>
-nnoremap <silent> g_ :call NavEndLineNonBlank('n') <CR>
+nnoremap <silent> 0 :call <SID>NavStartLine('n') <CR>
+nnoremap <silent> ^ :call <SID>NavStartLineNonBlank('n') <CR>
+nnoremap <silent> $ :call <SID>NavEndLine('n') <CR>
+nnoremap <silent> g_ :call <SID>NavEndLineNonBlank('n') <CR>
 
-xnoremap <silent> 0 :call NavStartLine('x') <CR>
-xnoremap <silent> ^ :call NavStartLineNonBlank('x') <CR>
-xnoremap <silent> $ :call NavEndLine('x') <CR>
-xnoremap <silent> g_ :call NavEndLineNonBlank('x') <CR>
+xnoremap <silent> 0 :call <SID>NavStartLine('x') <CR>
+xnoremap <silent> ^ :call <SID>NavStartLineNonBlank('x') <CR>
+xnoremap <silent> $ :call <SID>NavEndLine('x') <CR>
+xnoremap <silent> g_ :call <SID>NavEndLineNonBlank('x') <CR>
 " ----------------------------------------}}}
 
 "# buffers ----------------------------------------{{{
@@ -716,7 +791,7 @@ autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
 inoremap <expr> <C-o> pumvisible() ? "<C-e>" : "<C-x><C-o>"
 
 " open omni completion menu closing previous if open and opening new menu without changing the text
-" inoremap <expr> <C-Space> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') .
+" inoremap <expr> <C-o> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') .
 "             \ '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
 
 "navigation
@@ -735,13 +810,13 @@ nnoremap <C-k> 7k
 " ----------------------------------------}}}
 "
 "# navigate cursor to 'sol' and 'eol' ----------------------------------------{{{
-nnoremap <silent> <C-h> :call NavStartLineToggle('n') <CR>
-nnoremap <silent> <C-l> :call NavEndLineToggle('n') <CR>
+nnoremap <silent> <C-h> :call <SID>NavStartLineToggle('n') <CR>
+nnoremap <silent> <C-l> :call <SID>NavEndLineToggle('n') <CR>
 
-xnoremap <silent> <C-h> :call NavStartLineToggle('x') <CR>
-xnoremap <silent> <C-l> :call NavEndLineToggle('x') <CR>
+xnoremap <silent> <C-h> :call <SID>NavStartLineToggle('x') <CR>
+xnoremap <silent> <C-l> :call <SID>NavEndLineToggle('x') <CR>
 
-function! NavStartLine(mode)
+function! s:NavStartLine(mode)
 	if a:mode == 'n' || a:mode == 'x'
 		if a:mode == 'x'
 			execute "normal! gv"
@@ -754,7 +829,7 @@ function! NavStartLine(mode)
 	endif
 endfunc
 
-function! NavStartLineNonBlank(mode)
+function! s:NavStartLineNonBlank(mode)
 	if a:mode == 'n' || a:mode == 'x'
 		if a:mode == 'x'
 			execute "normal! gv"
@@ -767,7 +842,7 @@ function! NavStartLineNonBlank(mode)
 	endif
 endfunc
 
-function! NavEndLine(mode)
+function! s:NavEndLine(mode)
 	if a:mode == 'n' || a:mode == 'x'
 		if a:mode == 'x'
 			execute "normal! gv"
@@ -780,7 +855,7 @@ function! NavEndLine(mode)
 	endif
 endfunc
 
-function! NavEndLineNonBlank(mode)
+function! s:NavEndLineNonBlank(mode)
 	if a:mode == 'n' || a:mode == 'x'
 		if a:mode == 'x'
 			execute "normal! gv"
@@ -788,7 +863,7 @@ function! NavEndLineNonBlank(mode)
 		if &wrap ==# 1
 			"simple gg_ command won't work"
 			execute "normal! g$"
-			if CursorCharacter() =~ "\\s"
+			if s:CursorCharacter() =~ "\\s"
 				execute "normal! ge"
 			endif
 		else
@@ -797,30 +872,30 @@ function! NavEndLineNonBlank(mode)
 	endif
 endfunc
 
-function! NavStartLineToggle(mode)
+function! s:NavStartLineToggle(mode)
 	if a:mode == 'n' || a:mode == 'x'
 		if a:mode == 'x'
 			execute "normal! gv"
 		endif
 		let l:col1 = virtcol('.')
-			call NavStartLineNonBlank(a:mode)	
+			call s:NavStartLineNonBlank(a:mode)	
 		let l:col2 	= virtcol('.') 
 		if l:col1 ==# l:col2 
-			call NavStartLine(a:mode)	
+			call s:NavStartLine(a:mode)	
 		endif
 	endif
 endfunc
 
-function! NavEndLineToggle(mode)
+function! s:NavEndLineToggle(mode)
 	if a:mode == 'n' || a:mode == 'x'
 		if a:mode == 'x'
 			execute "normal! gv"
 		endif
 		let l:col1 = virtcol('.')
-			call NavEndLineNonBlank(a:mode)
+			call s:NavEndLineNonBlank(a:mode)
 		let l:col2 	= virtcol('.') 
 		if l:col1 ==# l:col2 
-			call NavEndLine(a:mode)
+			call s:NavEndLine(a:mode)
 		endif
 	endif
 endfunc
@@ -895,28 +970,28 @@ augroup foldMarker
 	autocmd FileType vim setlocal foldmethod=marker 
 	autocmd FileType vim setlocal foldmarker={{{,}}}
 
-	autocmd FileType vim command! FoldOpen call AddFoldMarkerOpen()<CR>
-	cnoreabbrev foldopen <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'FoldOpen' : 'foldopen')<CR>
+	" autocmd FileType vim command! FoldOpen call <SID>AddFoldMarkerOpen()<CR>
+	" cnoreabbrev foldopen <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'FoldOpen' : 'foldopen')<CR>
 
-	autocmd FileType vim command! FoldClose call AddFoldMarkerClose()<CR>
-	cnoreabbrev foldclose <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'FoldClose' : 'foldclose')<CR>
+	" autocmd FileType vim command! FoldClose call <SID>AddFoldMarkerClose()<CR>
+	" cnoreabbrev foldclose <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'FoldClose' : 'foldclose')<CR>
 augroup END
 
-function! AddFoldMarkerOpen()
-	call RemoveTrailingWhiteSpace()
-	execute "normal! a "
-	call RepeatCharacterAtCursor('-',40)
-	call RepeatCharacterAtCursor('{',3)
-	call CommentOutIfNot()
-endfunction
+" function! s:AddFoldMarkerOpen()
+"   call <SID>RemoveTrailingWhiteSpace()
+"   execute "normal! a "
+"   call <SID>RepeatCharacterAtCursor('-',40)
+"   call <SID>RepeatCharacterAtCursor('{',3)
+"   call <SID>CommentOutIfNot()
+" endfunction
 
-function! AddFoldMarkerClose()
-	call RemoveTrailingWhiteSpace()
-	execute "normal! a "
-	call RepeatCharacterAtCursor('-',40)
-	call RepeatCharacterAtCursor('}',3)
-	call CommentOutIfNot()
-endfunction
+" function! s:AddFoldMarkerClose()
+"   call <SID>RemoveTrailingWhiteSpace()
+"   execute "normal! a "
+"   call <SID>RepeatCharacterAtCursor('-',40)
+"   call <SID>RepeatCharacterAtCursor('}',3)
+"   call <SID>CommentOutIfNot()
+" endfunction
 " ----------------------------------------}}}
 
 "=========================
@@ -924,35 +999,35 @@ endfunction
 "=========================
 " ----------------------------------------{{{
 
-command! Boxify call BoxifyComment()<CR>
-cnoreabbrev boxify <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Boxify' : 'boxify')<CR>
-" nnoremap <leader>box :call BoxifyComment()<CR>
-function! BoxifyComment()
-	call UncommentIfNot()
-	call RemoveLeadingWhiteSpace()
-	call RemoveTrailingWhiteSpace()
-	normal! v0d
-	let l:len = strlen(@")
-	let l:autoComment = stridx(&formatoptions, 'o') 
-	normal! i"
-	call RepeatCharacterAtCursor(' ',6) 
-	normal! p
-	call RepeatCharacterAtCursor(' ',6) 
-	normal! O
+" command! Boxify call <SID>BoxifyComment()<CR>
+" cnoreabbrev boxify <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Boxify' : 'boxify')<CR>
+" " nnoremap <leader>box :call BoxifyComment()<CR>
+" function! s:BoxifyComment()
+"   call <SID>UncommentIfNot()
+"   call <SID>RemoveLeadingWhiteSpace()
+"   call <SID>RemoveTrailingWhiteSpace()
+"   normal! v0d
+"   let l:len = strlen(@")
+"   let l:autoComment = stridx(&formatoptions, 'o') 
+"   normal! i"
+"   call <SID>RepeatCharacterAtCursor(' ',6) 
+"   normal! p
+"   call <SID>RepeatCharacterAtCursor(' ',6) 
+"   normal! O
 
-	if l:autoComment == -1 
-		normal! i"
-	endif
+"   if l:autoComment == -1 
+"     normal! i"
+"   endif
 
-	call RepeatCharacterAtCursor('=', l:len+12)
-	normal! jo
+"   call <SID>RepeatCharacterAtCursor('=', l:len+12)
+"   normal! jo
 
-	if l:autoComment == -1 
-		normal! i"
-	endif
+"   if l:autoComment == -1 
+"     normal! i"
+"   endif
 
-	call RepeatCharacterAtCursor('=', l:len+12)
-endfunction
+"   call <SID>RepeatCharacterAtCursor('=', l:len+12)
+" endfunction
 " ----------------------------------------}}}
 
 
@@ -960,25 +1035,11 @@ endfunction
 "      Helper Functions      
 "============================
 " ----------------------------------------{{{
-function! CursorCharacter()	
+function! s:CursorCharacter()	
 	return matchstr(getline('.'), '\%'.col('.').'c.')
 endfunction
 
-function! CommentOutIfNot()	
-	normal! ^
-	if CursorCharacter() !=# "\""
-		normal! 0i"
-	endif
-endfunction
-
-function! UncommentIfNot()
-	normal! ^
-	while CursorCharacter() ==# "\""
-		normal! x
-	endwhile
-endfunction
-
-function! RepeatCharacterAtCursor(character, count)
+function! s:RepeatCharacterAtCursor(character, count)
 	let l:i = 0
 	while i < a:count
 		execute "normal!a".a:character
@@ -986,31 +1047,80 @@ function! RepeatCharacterAtCursor(character, count)
 	endwhile
 endfunction
 
-function! RemoveLeadingWhiteSpace()
-	normal! 0
-	while CursorCharacter() ==# " " || CursorCharacter() ==# "	"
-		normal! x
-	endwhile
-endfunction
-
-function! RemoveTrailingWhiteSpace()
-	normal! $
-	while CursorCharacter() ==# " " || CursorCharacter() ==# "	"
-		normal! x
-	endwhile
-endfunction
-
-function! StringReplaceCharacter(str, char, replace)
-	let l:ret = ''	
-	for c in split(a:str, '\zs')	
-		if c ==# a:char
-			let l:ret .=  a:replace	
-		else
-			let l:ret .= c
+func! s:CountSubString(str, substr)
+	let l:count = 0
+	let l:str = a:str
+	while 1
+		let l:idx = match(l:str, a:substr)
+		if l:idx ==# -1
+			break
 		endif
-	endfor
-	return l:ret
+		let l:str = substitute(l:str, a:substr, "", "") 
+		let l:count += 1	
+	endwhile
+	return l:count
 endfunction
+
+function! s:matches(str, substr) 
+	let l:str = a:str
+	let l:substrlen = strlen(a:substr)
+	let l:offset = 0
+	let l:idxs = []
+	while 1
+		let l:idx = match(l:str, a:substr)	
+		if l:idx ==# -1
+			break
+		endif
+		let l:idx += l:offset	
+		let l:idxs = add(l:idxs, l:idx)
+		let l:str = substitute(l:str, a:substr, "", "")
+		let l:offset += l:substrlen
+	endwhile
+	return l:idxs
+endfunction
+
+
+
+" function! s:CommentOutIfNot()	
+"   normal! ^
+"   if CursorCharacter() !=# "\"
+"     normal! 0i"
+"   endif
+" endfunction
+
+" function! s:UncommentIfNot()
+"   normal! ^
+"   while CursorCharacter() ==# "\"
+"     normal! x
+"   endwhile
+" endfunction
+
+
+" function! s:RemoveLeadingWhiteSpace()
+"   normal! 0
+"   while CursorCharacter() ==# " " || CursorCharacter() ==# "	"
+"     normal! x
+"   endwhile
+" endfunction
+
+" function! s:RemoveTrailingWhiteSpace()
+"   normal! $
+"   while CursorCharacter() ==# " " || <CursorCharacter() ==# "	"
+"     normal! x
+"   endwhile
+" endfunction
+
+" function! s:StringReplaceCharacter(str, char, replace)
+"   let l:ret = ''	
+"   for c in split(a:str, '\zs')	
+"     if c ==# a:char
+"       let l:ret .=  a:replace	
+"     else
+"       let l:ret .= c
+"     endif
+"   endfor
+"   return l:ret
+" endfunction
 
 " ----------------------------------------}}}
 
