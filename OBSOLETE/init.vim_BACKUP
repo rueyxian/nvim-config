@@ -59,6 +59,11 @@ Plug 'daveyarwood/vim-alda'
 " ==============================
 Plug 'rust-lang/rust.vim'
 
+
+" ==============================
+" neovim 0.5+ plugins
+" ==============================
+
 " Collection of common configurations for the Nvim LSP client
 Plug 'neovim/nvim-lspconfig'
 
@@ -162,17 +167,18 @@ endif
 " ============================================================
 " persist undo/redo tree of buffer after closing
 " ============================================================
-if has('persistent_undo')
-	set undofile
-	set undodir=~/.vim/undodir
-endif
+" if has('persistent_undo')
+"   set undofile
+"   set undodir=~/.vim/undodir
+" endif
 
 " ============================================================
 " auto change directory to current buffer (exclude terminal type)
 " ============================================================
 augroup changeDirCurr
 	autocmd!
-	autocmd BufCreate,BufEnter * if &buftype !=# 'terminal'| lcd %:p:h  | endif
+	" autocmd BufCreate,BufEnter * if &buftype !=# 'terminal'| lcd %:p:h  | endif
+	autocmd BufCreate,BufEnter * lcd %:p:h 
 augroup END	
 
 
@@ -408,6 +414,7 @@ let g:rustfmt_autosave = 1
 let g:rust_clip_command = 'pbcopy'
 
 
+
 " ##########################################################################################
 " fatih/vim-go
 " ##########################################################################################
@@ -425,8 +432,7 @@ let g:go_highlight_extra_types = 1
 let g:go_highlight_generate_tags = 1
 
 " Open :GoDeclsDir with ctrl-g
-nmap <C-g> :GoDeclsDir<cr>
-imap <C-g> <esc>:<C-u>GoDeclsDir<cr>
+autocmd FileType go noremap <C-g> :GoDeclsDir<cr>
 
 "gohtml syntax highlighting
 au BufRead,BufNewFile *.gohtml set filetype=gohtmltmpl
@@ -699,7 +705,7 @@ func! WrapLinebreak()
 endfunc
 
 " ============================================================
-" repeat character
+" repeat characters
 " ============================================================
 cnoreabbrev rpc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'RpC' : 'rpc')<CR>
 command! -nargs=+ RpC call <SID>RepeatCharacter(<f-args>)
@@ -712,25 +718,147 @@ function! s:RepeatCharacter(string, count)
 	endif
 endfunc
 
-" ============================================================
-" get file path
-" ============================================================
-cnoreabbrev <silent> filepathfromhome <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "call <SID>FilePath()" : "filepathfromhome")<CR>
-function! s:FilePath()	
-	if stridx(getcwd(), $HOME) ==# 0
-		let l:filepath = "~".getcwd()[strlen($HOME):]
-		echom "clipboard copied: ".l:filepath
-		let @+ = l:filepath
-	else
-		echom "clipboard copy failed"
-	endif
-endfunction
-
-
 
 " ##########################################################################################
 " key mappings
 " ##########################################################################################
+
+" ============================================================
+" edit or source config file
+" ============================================================
+nnoremap <expr> <F12> &filetype ==# 'vim' ? ":source %<CR>" : ":edit $MYVIMRC<CR>"
+
+" ============================================================
+" buffers
+" ============================================================
+"delete buffer
+nnoremap <F10> :BD!<CR>
+nnoremap <Leader><F10> :bd!<CR>
+
+"next/prev buffer
+nnoremap \ :bn<CR>
+nnoremap <C-\> :bp<CR>
+
+
+" ============================================================
+" create/delete terminal emulator buffer
+" ============================================================
+"create terminal buffer and cd to current directory
+"delete terminal buffer by using qpkorr/vim-bufkill plugin to retain the window
+nnoremap <expr> <F3> &buftype ==# 'terminal' ? ":BD!<CR>" : ":cd %:p:h<CR>:terminal<CR>i"
+nnoremap <expr> <Leader><F3> &buftype ==# 'terminal' ? ":bd!<CR>" : ":cd %:p:h<CR>:vsp<CR>:terminal<CR>i"
+nnoremap <C-F3> :terminal<CR>
+
+tnoremap <F3> <C-\><C-n>:BD!<CR>
+tnoremap <Leader><F3> <C-\><C-n>:bd!<CR>
+
+" ============================================================
+" navigate errors & close quickfix window
+" ============================================================
+map <C-n> :cnext<CR>
+map <C-m> :cprevious<CR>
+nnoremap <leader>a :cclose<CR>
+
+
+" ============================================================
+" escape to normal mode
+" ============================================================
+" inoremap <C-k> <Esc>
+" vnoremap <C-k> <Esc>
+" tnoremap <C-k> <C-\><C-n>
+
+" ============================================================
+" omni completion
+" ============================================================
+" auto close preview window
+autocmd InsertLeave * if pumvisible() == 0|pclose|endif
+autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
+
+" toggle omni completion
+inoremap <expr> <C-o> pumvisible() ? "<C-e>" : "<C-x><C-o>"
+
+" open omni completion menu closing previous if open and opening new menu without changing the text
+" inoremap <expr> <C-o> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') .
+"             \ '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
+
+" navigation
+inoremap <expr> <C-j> pumvisible() ? "<C-n>" : "<C-j>"
+inoremap <expr> <C-k> pumvisible() ? "<C-p>" : "<C-k>"
+inoremap <expr> <C-d> pumvisible() ? "<C-n><C-n><C-n><C-n><C-n>" : "<C-d>"
+inoremap <expr> <C-u> pumvisible() ? "<C-p><C-p><C-p><C-p><C-p>" : "<C-u>"
+
+" accept completion
+inoremap <expr> <CR> pumvisible() ? "<C-y>" : "<CR>"
+
+
+" ============================================================
+" extends j and k's motion
+" ============================================================
+" nnoremap <C-j> 7j
+" nnoremap <C-k> 7k
+
+
+
+" ============================================================
+" delete line without deleting eol character
+" ============================================================
+nnoremap dD 0d$
+
+" ============================================================
+" open line without entering insert mode
+" ============================================================
+nnoremap o o<Esc>
+nnoremap <S-o> O<Esc>
+
+" ============================================================
+" wrap word with text object
+" ============================================================
+nnoremap <Leader>[ viw<Esc>a]<Esc>bi[<Esc>E
+nnoremap <Leader>( viw<Esc>a)<Esc>bi(<Esc>E
+nnoremap <Leader>{ viw<Esc>a}<Esc>bi{<Esc>E
+nnoremap <Leader>< viw<Esc>a><Esc>bi<<Esc>E
+nnoremap <Leader>' viw<Esc>a'<Esc>bi'<Esc>E
+nnoremap <Leader>" viw<Esc>a"<Esc>bi"<Esc>E
+nnoremap <Leader>` viw<Esc>a`<Esc>bi`<Esc>E
+
+nnoremap <Leader><Leader>[ viW<Esc>a]<Esc>Bi[<Esc>E
+nnoremap <Leader><Leader>( viW<Esc>a)<Esc>Bi(<Esc>E
+nnoremap <Leader><Leader>{ viW<Esc>a}<Esc>Bi{<Esc>E
+nnoremap <Leader><Leader>< viW<Esc>a><Esc>Bi<<Esc>E
+nnoremap <Leader><Leader>' viW<Esc>a'<Esc>Bi'<Esc>E
+nnoremap <Leader><Leader>" viW<Esc>a"<Esc>Bi"<Esc>E
+nnoremap <Leader><Leader>` viW<Esc>a`<Esc>Bi`<Esc>E
+
+" ============================================================
+" wrap highlighted with text object
+" ============================================================
+vnoremap <Leader>[ di[]<Esc>hp
+vnoremap <Leader>( di()<Esc>hp
+vnoremap <Leader>{ di{}<Esc>hp
+vnoremap <Leader>< di<lt>><Esc>hp
+vnoremap <Leader>' di''<Esc>hp
+vnoremap <Leader>" di""<Esc>hp
+vnoremap <Leader>` di``<Esc>hp
+
+" ============================================================
+" enable text-object selection without position cursor inside text-object
+" ============================================================
+onoremap i[ :<C-u>normal! f]vi[<CR>
+onoremap i( :<C-u>normal! f)vi(<CR>
+onoremap i{ :<C-u>normal! f}vi{<CR>
+onoremap i< :<C-u>normal! f>vi<<CR>
+onoremap i' :<C-u>normal! f'vi'<CR>
+onoremap i" :<C-u>normal! f"vi"<CR>
+onoremap i` :<C-u>normal! f`vi`<CR>
+
+onoremap I[ :<C-u>normal! F]vi[<CR>
+onoremap I( :<C-u>normal! F)vi(<CR>
+onoremap I{ :<C-u>normal! F}vi{<CR>
+onoremap I< :<C-u>normal! F>vi<<CR>
+onoremap I' :<C-u>normal! F'vi'<CR>
+onoremap I" :<C-u>normal! F"vi"<CR>
+onoremap I` :<C-u>normal! F`vi`<CR>
+
 
 " ============================================================
 " linewise motion (if &wrap=1)
@@ -845,143 +973,6 @@ function! s:NavEndLineToggle(mode)
 		endif
 	endif
 endfunc
-
-" ============================================================
-" buffers
-" ============================================================
-"delete buffer
-nnoremap <F10> :BD!<CR>
-nnoremap <Leader><F10> :bd!<CR>
-
-"next/prev buffer
-nnoremap \ :bn<CR>
-nnoremap <C-\> :bp<CR>
-"
-"
-" ============================================================
-" edit vimrc or resrouce vimrc
-" ============================================================
-nnoremap <expr> <F12> &filetype ==# 'vim' ? ":source %<CR>" : ":edit $MYVIMRC<CR>"
-
-
-" ============================================================
-" create/delete terminal emulator buffer
-" ============================================================
-"create terminal buffer and cd to current directory
-"delete terminal buffer by using qpkorr/vim-bufkill plugin to retain the window
-nnoremap <expr> <F3> &buftype ==# 'terminal' ? ":BD!<CR>" : ":cd %:p:h<CR>:terminal<CR>i"
-nnoremap <expr> <Leader><F3> &buftype ==# 'terminal' ? ":bd!<CR>" : ":cd %:p:h<CR>:vsp<CR>:terminal<CR>i"
-nnoremap <C-F3> :terminal<CR>
-
-tnoremap <F3> <C-\><C-n>:BD!<CR>
-tnoremap <Leader><F3> <C-\><C-n>:bd!<CR>
-
-" ============================================================
-" navigate errors & close quickfix window
-" ============================================================
-map <C-n> :cnext<CR>
-map <C-m> :cprevious<CR>
-nnoremap <leader>a :cclose<CR>
-
-
-" ============================================================
-" escape to normal mode
-" ============================================================
-inoremap <C-Space> <Esc>
-vnoremap <C-Space> <Esc>
-tnoremap <C-Space> <C-\><C-n>
-
-" ============================================================
-" omni completion
-" ============================================================
-" auto close preview window
-autocmd InsertLeave * if pumvisible() == 0|pclose|endif
-autocmd CursorMovedI * if pumvisible() == 0|pclose|endif
-
-" toggle omni completion
-inoremap <expr> <C-o> pumvisible() ? "<C-e>" : "<C-x><C-o>"
-
-" open omni completion menu closing previous if open and opening new menu without changing the text
-" inoremap <expr> <C-o> (pumvisible() ? (col('.') > 1 ? '<Esc>i<Right>' : '<Esc>i') : '') .
-"             \ '<C-x><C-o><C-r>=pumvisible() ? "\<lt>C-n>\<lt>C-p>\<lt>Down>" : ""<CR>'
-
-" navigation
-inoremap <expr> <C-j> pumvisible() ? "<C-n>" : "<C-j>"
-inoremap <expr> <C-k> pumvisible() ? "<C-p>" : "<C-k>"
-inoremap <expr> <C-d> pumvisible() ? "<C-n><C-n><C-n><C-n><C-n>" : "<C-d>"
-inoremap <expr> <C-u> pumvisible() ? "<C-p><C-p><C-p><C-p><C-p>" : "<C-u>"
-
-" accept completion
-inoremap <expr> <CR> pumvisible() ? "<C-y>" : "<CR>"
-
-
-" ============================================================
-" extends j and k's motion
-" ============================================================
-nnoremap <C-j> 7j
-nnoremap <C-k> 7k
-
-
-
-" ============================================================
-" delete line without deleting eol character
-" ============================================================
-nnoremap dD 0d$
-
-" ============================================================
-" open line without entering insert mode
-" ============================================================
-nnoremap o o<Esc>
-nnoremap <S-o> O<Esc>
-
-" ============================================================
-" wrap word with text object
-" ============================================================
-nnoremap <Leader>[ viw<Esc>a]<Esc>bi[<Esc>E
-nnoremap <Leader>( viw<Esc>a)<Esc>bi(<Esc>E
-nnoremap <Leader>{ viw<Esc>a}<Esc>bi{<Esc>E
-nnoremap <Leader>< viw<Esc>a><Esc>bi<<Esc>E
-nnoremap <Leader>' viw<Esc>a'<Esc>bi'<Esc>E
-nnoremap <Leader>" viw<Esc>a"<Esc>bi"<Esc>E
-nnoremap <Leader>` viw<Esc>a`<Esc>bi`<Esc>E
-
-nnoremap <Leader><Leader>[ viW<Esc>a]<Esc>Bi[<Esc>E
-nnoremap <Leader><Leader>( viW<Esc>a)<Esc>Bi(<Esc>E
-nnoremap <Leader><Leader>{ viW<Esc>a}<Esc>Bi{<Esc>E
-nnoremap <Leader><Leader>< viW<Esc>a><Esc>Bi<<Esc>E
-nnoremap <Leader><Leader>' viW<Esc>a'<Esc>Bi'<Esc>E
-nnoremap <Leader><Leader>" viW<Esc>a"<Esc>Bi"<Esc>E
-nnoremap <Leader><Leader>` viW<Esc>a`<Esc>Bi`<Esc>E
-
-" ============================================================
-" wrap highlighted with text object
-" ============================================================
-vnoremap <Leader>[ di[]<Esc>hp
-vnoremap <Leader>( di()<Esc>hp
-vnoremap <Leader>{ di{}<Esc>hp
-vnoremap <Leader>< di<lt>><Esc>hp
-vnoremap <Leader>' di''<Esc>hp
-vnoremap <Leader>" di""<Esc>hp
-vnoremap <Leader>` di``<Esc>hp
-
-" ============================================================
-" enable text-object selection without position cursor inside text-object
-" ============================================================
-onoremap i[ :<C-u>normal! f]vi[<CR>
-onoremap i( :<C-u>normal! f)vi(<CR>
-onoremap i{ :<C-u>normal! f}vi{<CR>
-onoremap i< :<C-u>normal! f>vi<<CR>
-onoremap i' :<C-u>normal! f'vi'<CR>
-onoremap i" :<C-u>normal! f"vi"<CR>
-onoremap i` :<C-u>normal! f`vi`<CR>
-
-onoremap I[ :<C-u>normal! F]vi[<CR>
-onoremap I( :<C-u>normal! F)vi(<CR>
-onoremap I{ :<C-u>normal! F}vi{<CR>
-onoremap I< :<C-u>normal! F>vi<<CR>
-onoremap I' :<C-u>normal! F'vi'<CR>
-onoremap I" :<C-u>normal! F"vi"<CR>
-onoremap I` :<C-u>normal! F`vi`<CR>
 
 
 " ##########################################################################################
