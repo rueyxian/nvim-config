@@ -13,13 +13,37 @@ return require('packer').startup(function(use)
   use {'wbthomason/packer.nvim', opt = true}
 
 
+  ------------------------------
   -- color theme
+  ------------------------------
   use 'fatih/molokai'
   use 'morhetz/gruvbox'
+  use 'arcticicestudio/nord-vim'
+  use 'sainnhe/sonokai'
+  use 'sainnhe/gruvbox-material'
+  use 'sainnhe/everforest'
+  use 'sainnhe/edge'
 
+
+
+  ------------------------------
+  --  terminal
+  ------------------------------
+  use "akinsho/toggleterm.nvim"
+
+  ------------------------------
+  -- indentation guide
+  ------------------------------
+  use 'nathanaelkane/vim-indent-guides'
+
+  ------------------------------
+  -- comment
+  ------------------------------
   use 'scrooloose/nerdcommenter'
 
-
+  ------------------------------
+  -- file explorer
+  ------------------------------
   use {
     'kyazdani42/nvim-tree.lua',
     requires = 'kyazdani42/nvim-web-devicons'

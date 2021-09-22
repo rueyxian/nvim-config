@@ -21,7 +21,7 @@ vim.o.splitbelow = true
 
 
 -- show list characters
-vim.o.list = true
+vim.o.list = false
 vim.opt.listchars = { space = '·', tab = '→ ', eol = '↲'}
 vim.cmd([[
   if exists('+termguicolors')
@@ -32,30 +32,12 @@ vim.cmd([[
 
 
 
-------------------------------------------------------------
--- colors
-------------------------------------------------------------
-vim.o.termguicolors = true
-
-vim.cmd 'colorscheme gruvbox'
-
--- fatih/molokai
-vim.g["rehash256"] = 1
-vim.g["molokai_original"] = 1
-
--- morhetz/gruvbox
-vim.g["gruvbox_termcolors"] = 256
-vim.g["gruvbox_contrast_dark"] = 'hard'
-vim.g["gruvbox_invert_selection"] = '0'
 
 
 
 
 
--- if exists(‘+termguicolors’)
--- 	let &t_8f = “\<Esc>[38;2;%lu;%lu;%lum”
--- 	let &t_8b = “\<Esc>[48;2;%lu;%lu;%lum”
--- endif
+
 
 ------------------------------------------------------------
 -- remove auto comment when open a new line from a commented line
@@ -65,7 +47,6 @@ vim.g["gruvbox_invert_selection"] = '0'
 -- vim.opt.formatoptions:remove('r')
 -- TODO how to do it in lua?
  vim.cmd([[autocmd BufNewFile,BufRead * setlocal formatoptions-=cro]])
-
 
 
 
@@ -79,9 +60,10 @@ vim.g["gruvbox_invert_selection"] = '0'
 -- auto completion
 ------------------------------------------------------------
 vim.o.completeopt = 'menuone,preview,noinsert,noselect'
--- vim.cmd("let g:completion_matching_strategy_list = ['exact', 'substring', 'fuzzy']")
+-- vim.o.completeopt = 'menuone,preview,noselect'
 vim.g.completetion_matching_strategy_list = {'exact', 'substring', 'fuzzy'}
 -- vim.g.completetion_matching_strategy_list = {'substring', 'fuzzy'}
+-- vim.g.completetion_matching_strategy_list = {'fuzzy'}
 
 ------------------------------------------------------------
 -- enable to copy to clipboard for operations like yank, delete, change and put
@@ -91,5 +73,7 @@ if vim.fn.has('unnamedplus') == 1 then
   vim.opt_global.clipboard:prepend('unnamed')
   vim.opt_global.clipboard:prepend('unnamedplus')
 end
+
+
 
 

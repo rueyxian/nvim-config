@@ -10,6 +10,7 @@ vim.api.nvim_set_keymap('n', '<Space>', '<NOP>', {noremap = true, silent = true}
 -- vim.cmd("nnoremap <expr> <F12> &filetype ==# 'vim' ? ':source %<CR>' : ':edit $MYVIMRC<CR>'")
 vim.api.nvim_set_keymap('n', '<F12>', ':edit $MYVIMRC<CR>', {noremap = true})
 
+
 -- kill buffer
 vim.api.nvim_set_keymap('n', '<F10>', ':bd #<CR>', {noremap = true, silent = true})
 
@@ -92,5 +93,15 @@ vim.api.nvim_set_keymap('x', 'J', ':move \'>+1<CR>gv=gv', {noremap = true, silen
 -- commands & abbreviation
 ------------------------------------------------------------
 -- remove highlight
-vim.cmd 'cnoreabbrev hlc <C-r>=(getcmdtype()==#\':\' && getcmdpos()==#1 ? "let @/=\'\'" : "hlc")<CR>'
+vim.cmd[[cnoreabbrev <silent> hlc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "let @/=''" : "hlc")<CR>]]
+
+
+-- TODO
+-- change directory
+-- vim.cmd[[cnoreabbrev <silent> chdir <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h<CR>:pwd" : "chdir")<CR>]]
+-- vim.cmd[[cnoreabbrev <silent> chdir <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h" : "chdir")<CR>:pwd<CR>]]
+
+
+
+
 

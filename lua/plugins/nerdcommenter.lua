@@ -24,11 +24,11 @@ vim.g.NERDCompactSexyComs = 1
 vim.g.NERDDefaultAlign = 'left'
 
 -- Set a language to use its alternate delimiters by default
-vim.g.NERDAltDelims_java = 1
+-- vim.g.NERDAltDelims_java = 1
 
 -- Add your own custom formats or override the defaults
 -- let g:NERDCustomDelimiters = { 'c': { 'left': '/**','right': '*/' } }
-vim.g.NERDCustomDelimiters = {'c', {{'left', '/**'}, {'right', '*/'}}}
+-- vim.g.NERDCustomDelimiters = {'c', {{'left', '/**'}, {'right', '*/'}}}
 
 -- Allow commenting and inverting empty lines (useful when commenting a region)
 vim.g.NERDCommentEmptyLines = 1

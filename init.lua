@@ -14,30 +14,35 @@
 -- https://www.lua.org/pil/contents.html
 -- https://ebens.me/post/lua-for-programmers-part-1/
 
+------------------------------------------------------------
+-- basic
+------------------------------------------------------------
 require('settings')
 require('key-mappings')
-
+require('color-themes')
 
 
 ------------------------------------------------------------
 -- plugins
 ------------------------------------------------------------
 require('plugins')
+
+require('plugins/toggleterm')
+
 require('plugins/nerdcommenter')
 
+require('plugins/vim-indent-guides')
+
 require('plugins/nvim-tree')
-
-
 
 require('plugins/nvim-cmp')
 require('plugins/nvim-autopairs')
 
-
 require('plugins/telescope')
 
 
--- TODO migrate from vim-go to built-in lsp
--- require('plugins/vim-go')
+-- TODO get rid of vim-go, use go-pls only
+require('plugins/vim-go')
 
 ------------------------------
 -- lspconfig

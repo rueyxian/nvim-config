@@ -1,2 +1,3 @@
-# vimrc
-my vimrc config
+# nvim-config
+
+nvim + lua = ♥︎ 
