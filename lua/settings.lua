@@ -8,7 +8,7 @@ vim.opt.iskeyword:append('-')
 vim.o.encoding = "UTF-8"
 
 -- vim.g.netrw_banner = 0
-vim.g.loaded_netrw = 0
+-- vim.g.loaded_netrw = 0
 
 vim.o.expandtab = true
 vim.o.shiftwidth = 4
@@ -32,30 +32,11 @@ vim.opt.synmaxcol = 1000
 vim.opt.lazyredraw = true
 
 
-
-
 ------------------------------------------------------------
 -- show list characters
 ------------------------------------------------------------
 vim.o.list = false
 vim.opt.listchars = { space = '·', tab = '→ ', eol = '↲'}
-
-
---
--- vim.cmd([[
---   if exists('+termguicolors')
---     let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
---     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
---   endif
--- ]])
-
-
-
-
-
-
-
-
 
 
 ------------------------------------------------------------

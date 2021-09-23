@@ -24,9 +24,7 @@ require('color-themes')
 ------------------------------------------------------------
 -- key mappings
 ------------------------------------------------------------
-require('key-mappings/basic')
-require('key-mappings/lsp')
-require('key-mappings/misc')
+require('key-mappings')
 
 
 ------------------------------------------------------------
