@@ -6,9 +6,14 @@ vim.opt.iskeyword:append('-')
 
 
 vim.o.encoding = "UTF-8"
+
+-- vim.g.netrw_banner = 0
+vim.g.loaded_netrw = 0
+
 vim.o.expandtab = true
-vim.o.shiftwidth = 2
+vim.o.shiftwidth = 4
 vim.o.softtabstop = 2
+
 vim.o.number = true
 vim.o.relativenumber = true
 vim.o.scrolloff = 999
@@ -18,17 +23,31 @@ vim.o.splitright = true
 vim.o.splitbelow = true
 
 
+------------------------------------------------------------
+-- performance
+------------------------------------------------------------
+vim.opt.hidden = true
+vim.opt.history = 500
+vim.opt.synmaxcol = 1000
+vim.opt.lazyredraw = true
 
 
+
+
+------------------------------------------------------------
 -- show list characters
+------------------------------------------------------------
 vim.o.list = false
 vim.opt.listchars = { space = '·', tab = '→ ', eol = '↲'}
-vim.cmd([[
-  if exists('+termguicolors')
-    let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-    let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-  endif
-]])
+
+
+--
+-- vim.cmd([[
+--   if exists('+termguicolors')
+--     let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+--     let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+--   endif
+-- ]])
 
 
 
@@ -46,14 +65,7 @@ vim.cmd([[
 -- vim.opt.formatoptions:remove('o')
 -- vim.opt.formatoptions:remove('r')
 -- TODO how to do it in lua?
- vim.cmd([[autocmd BufNewFile,BufRead * setlocal formatoptions-=cro]])
-
-
-
-------------------------------------------------------------
--- remove whitespace on save
-------------------------------------------------------------
--- cmd[[au BufWritePre * :%s/\s\+$//e]]
+ vim.cmd([[autocmd BufNewFile,BufEnter * setlocal formatoptions-=cro]])
 
 
 ------------------------------------------------------------

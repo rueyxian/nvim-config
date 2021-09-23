@@ -5,7 +5,7 @@ vim.o.termguicolors = true
 
 -- vim.cmd 'colorscheme nord'
 vim.cmd([[
-  colorscheme sonokai
+  colorscheme nord
 ]])
 
 -- vim.g.colorscheme = 'nord'
@@ -38,7 +38,7 @@ vim.g.gruvbox_improved_warnings = false
 ------------------------------------------------------------
 -- :help sonokai.txt
 -- default | atlantis | andromeda | shusia | maia | espresso
-vim.g.sonokai_style = 'espresso'
+vim.g.sonokai_style = 'shusia'
 vim.g.sonokai_enable_italic = 0
 vim.g.sonokai_disable_italic_comment = 1
 vim.g.sonokai_transparent_background = 0

@@ -66,7 +66,11 @@ return require('packer').startup(function(use)
   ------------------------------
   -- lsp
   ------------------------------
+  use 'glepnir/lspsaga.nvim'
+
   use 'neovim/nvim-lspconfig'
+
+
   use 'simrat39/rust-tools.nvim'
   -- use 'kabouzeid/nvim-lspinstall'
 

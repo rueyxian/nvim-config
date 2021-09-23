@@ -15,11 +15,18 @@
 -- https://ebens.me/post/lua-for-programmers-part-1/
 
 ------------------------------------------------------------
--- basic
+-- settings
 ------------------------------------------------------------
 require('settings')
-require('key-mappings')
 require('color-themes')
+
+
+------------------------------------------------------------
+-- key mappings
+------------------------------------------------------------
+require('key-mappings/basic')
+require('key-mappings/lsp')
+require('key-mappings/misc')
 
 
 ------------------------------------------------------------
@@ -27,7 +34,6 @@ require('color-themes')
 ------------------------------------------------------------
 require('plugins')
 
-require('plugins/toggleterm')
 
 require('plugins/nerdcommenter')
 
@@ -45,12 +51,18 @@ require('plugins/telescope')
 require('plugins/vim-go')
 
 ------------------------------
--- lspconfig
+-- lsp configuration
 ------------------------------
--- https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md 
+-- https://github.com/neovim/nvim-lspconfig/blob/master/CONFIG.md
 require('plugins/nvim-lspconfig')
 
+require('plugins/lspsaga')
 
+
+
+------------------------------
+-- language servers
+------------------------------
 -- lua
 require('plugins/nvim-lspconfig/lua-language-server')
 -- require('plugins/nvim-lspconfig/lua-ls')

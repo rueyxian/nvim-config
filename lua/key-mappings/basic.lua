@@ -12,7 +12,11 @@ vim.api.nvim_set_keymap('n', '<F12>', ':edit $MYVIMRC<CR>', {noremap = true})
 
 
 -- kill buffer
-vim.api.nvim_set_keymap('n', '<F10>', ':bd #<CR>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<F9>', ':bd<CR>', {noremap = true, silent = true})
+
+-- quit
+vim.api.nvim_set_keymap('n', '<F10>', ':quit<CR>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('i', '<F10>', '<Esc>:quit<CR>', {noremap = true, silent = true})
 
 -- close quickfix window
 vim.api.nvim_set_keymap('n', '<leader>a', ':cclose<CR>', {noremap = true, silent = true})
@@ -100,6 +104,37 @@ vim.cmd[[cnoreabbrev <silent> hlc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ?
 -- change directory
 -- vim.cmd[[cnoreabbrev <silent> chdir <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h<CR>:pwd" : "chdir")<CR>]]
 -- vim.cmd[[cnoreabbrev <silent> chdir <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h" : "chdir")<CR>:pwd<CR>]]
+
+
+
+
+
+
+
+
+-- TODO write it in lua
+-- cnoreabbrev rpt <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? 'Rpt' : 'rpt')<CR>
+-- command! -nargs=+ Rpt call <SID>Repeat(<f-args>)
+--
+-- function! s:Repeat(string, count)
+--   if a:count =~ '\d'
+--   call s:RepeatAtCursor(a:string, a:count)
+--   else
+--     echom "second argument has to be an integer"
+--   endif
+-- endfunc
+--
+--
+-- function! s:RepeatAtCursor(character, count)
+--   let l:i = 0
+--   while i < a:count
+--     execute "normal!a".a:character
+--     let l:i += 1
+--   endwhile
+-- endfunction
+
+
+
 
 
 
