@@ -11,10 +11,10 @@ vim.o.encoding = "UTF-8"
 vim.o.undofile = true 
 
 
+
 -- vim.g.netrw_banner = 0
 -- vim.g.loaded_netrw = 0
 
-vim.opt_global.statusline:append('%F')
 
 vim.o.expandtab = true
 vim.o.shiftwidth = 4
@@ -27,6 +27,9 @@ vim.o.wrap = false
 
 vim.o.splitright = true
 vim.o.splitbelow = true
+
+
+vim.o.swapfile = false
 
 
 ------------------------------------------------------------
