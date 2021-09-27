@@ -1,4 +1,7 @@
+
+
 local lspconfig = require "lspconfig"
+
 
 lspconfig.gopls.setup{
   on_attach = on_attach_vim,
@@ -20,12 +23,18 @@ lspconfig.gopls.setup{
       vendor = true,
       },
       usePlaceholders = true,
+
     },
   },
 }
 
 
+
+
+-- ============================================================
+
 function goimports(timeout_ms)
+
   local context = { only = { "source.organizeImports" } }
   vim.validate { context = { context, "t", true } }
 
@@ -56,3 +65,10 @@ function goimports(timeout_ms)
 end
 
 vim.cmd 'autocmd BufWritePre *.go lua goimports(1000)'
+
+
+
+
+
+
+

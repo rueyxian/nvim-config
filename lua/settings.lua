@@ -7,8 +7,14 @@ vim.opt.iskeyword:append('-')
 
 vim.o.encoding = "UTF-8"
 
+-- persist undo/redo tree
+vim.o.undofile = true 
+
+
 -- vim.g.netrw_banner = 0
 -- vim.g.loaded_netrw = 0
+
+vim.opt_global.statusline:append('%F')
 
 vim.o.expandtab = true
 vim.o.shiftwidth = 4
@@ -38,6 +44,15 @@ vim.opt.lazyredraw = true
 vim.o.list = false
 vim.opt.listchars = { space = '·', tab = '→ ', eol = '↲'}
 
+
+
+------------------------------------------------------------
+-- persist undo tree
+------------------------------------------------------------
+-- vim.o.undodir = "~/.config/nvim/undodir"
+-- $HOME/.vim/undo
+-- "set undodir=~/.vim/undodir
+-- "set undofile
 
 ------------------------------------------------------------
 -- remove auto comment when open a new line from a commented line

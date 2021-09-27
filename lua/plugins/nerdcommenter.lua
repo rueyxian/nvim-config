@@ -40,4 +40,4 @@ vim.g.NERDToggleCheckAllLines = 1
 --https://github.com/neovim/neovim/blob/b535575acdb037c35a9b688bc2d8adc2f3dece8d/src/nvim/keymap.h#L225
 -- vim.api.nvim_set_keymap('', '<C-//>', '<plug>NERDCommenterToggle', {noremap = true, silent = true})
 vim.cmd('nmap <C-_> <plug>NERDCommenterToggle')
-vim.cmd('xmap <C-_> <plug>NERDCommenterTogglegv<Esc>v')
+vim.cmd('xmap <C-_> <plug>NERDCommenterToggle')

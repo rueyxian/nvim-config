@@ -3,12 +3,9 @@
 
 vim.o.termguicolors = true
 
--- vim.cmd 'colorscheme nord'
-vim.cmd([[
-  colorscheme nord
-]])
 
--- vim.g.colorscheme = 'nord'
+vim.cmd('colorscheme nord')
+
 
 ------------------------------------------------------------
 -- fatih/molokai
@@ -43,7 +40,7 @@ local nightfox = require('nightfox')
 -- This function set the configuration of nightfox. If a value is not passed in the setup function
 -- it will be taken from the default configuration above
 nightfox.setup({
-  fox = "nightfox", -- nightfox | nordfox | palefox
+  fox = "nordfox", -- nightfox | nordfox | palefox
   styles = {
     -- comments = "italic", -- change style of comments to be italic
     -- keywords = "bold", -- change style of keywords to be bold

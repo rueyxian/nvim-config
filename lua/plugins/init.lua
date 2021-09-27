@@ -28,6 +28,13 @@ return require('packer').startup(function(use)
       use 'EdenEast/nightfox.nvim'
 
 
+
+      ------------------------------
+      --  statusline
+      ------------------------------
+    use 'hoob3rt/lualine.nvim' 
+
+
       ------------------------------
       --  terminal
       ------------------------------
@@ -51,18 +58,12 @@ return require('packer').startup(function(use)
         requires = 'kyazdani42/nvim-web-devicons'
       }
 
-      -- use 'kyazdani42/nvim-tree.lua'
-      -- use 'ryanoasis/vim-devicons'
-
-      -- use "kyazdani42/nvim-web-devicons"
-      -- use 'b3nj5m1n/kommentary'
 
 
       ------------------------------
       -- vim-go (yawn~)
       ------------------------------
       -- use 'fatih/vim-go'
-      -- use 'SirVer/ultisnips'
 
 
       ------------------------------

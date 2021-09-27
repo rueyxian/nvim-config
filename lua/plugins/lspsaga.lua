@@ -121,17 +121,17 @@ vim.api.nvim_set_keymap('n', 'gh', "<cmd>lua require'lspsaga.provider'.lsp_finde
 ------------------------------------------------------------
 -- diagnostic
 ------------------------------------------------------------
--- vim.api.nvim_set_keymap('n', '<Leader>e', "<cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<Leader>e', "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<Leader>e', "<cmd>lua require'lspsaga.diagnostic'.show_line_diagnostics()<CR>", {noremap = true, silent = true})
+-- vim.api.nvim_set_keymap('n', '<Leader>e', "<cmd>lua vim.lsp.diagnostic.show_line_diagnostics()<CR>", {noremap = true, silent = true})
 
 -- TODO: seems useless
 -- vim.api.nvim_set_keymap('n', '<Leader>cc', "<cmd>lua require'lspsaga.diagnostic'.show_cursor_diagnostics()<CR>" {noremap = true, silent = true})
 
 -- goto prev & next
--- vim.api.nvim_set_keymap('n', '[e', "<cmd>lua require'lspsaga.diagnostic'.lsp_jump_diagnostic_prev()<CR>", {noremap = true, silent = true})
--- vim.api.nvim_set_keymap('n', ']e', "<cmd>lua require'lspsaga.diagnostic'.lsp_jump_diagnostic_next()<CR>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '[e', "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', ']e', "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '[e', "<cmd>lua require'lspsaga.diagnostic'.lsp_jump_diagnostic_prev()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', ']e', "<cmd>lua require'lspsaga.diagnostic'.lsp_jump_diagnostic_next()<CR>", {noremap = true, silent = true})
+-- vim.api.nvim_set_keymap('n', '[e', "<cmd>lua vim.lsp.diagnostic.goto_prev()<CR>", {noremap = true, silent = true})
+-- vim.api.nvim_set_keymap('n', ']e', "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>", {noremap = true, silent = true})
 
 -- TODO: seems also useless
 -- vim.api.nvim_set_keymap('n', '<Leader>q', '<cmd>lua vim.lsp.diagnostic.set_loclist()<CR>', {noremap = true, silent = true})
@@ -144,9 +144,13 @@ vim.api.nvim_set_keymap('n', ']e', "<cmd>lua vim.lsp.diagnostic.goto_next()<CR>"
 ------------------------------------------------------------
 -- <C-\><C-n> : escape from terminal
 vim.api.nvim_set_keymap('n', '<F3>', "<cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>", {noremap = true, silent = true})
--- vim.api.nvim_set_keymap('n', '<F3>', ":cd %:p:h<CR><cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<Leader><F3>', ":cd %:p:h<CR><cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>", {noremap = true, silent = true})
 vim.api.nvim_set_keymap('t', '<F3>', "<C-\\><C-n>:lua require('lspsaga.floaterm').close_float_terminal()<CR>", {noremap = true, silent = true})
 -- requires lazygit
 -- brew install lazygit
-vim.api.nvim_set_keymap('n', '<Leader><F3>', "<cmd>lua require('lspsaga.floaterm').open_float_terminal('lazygit')<CR>", {noremap = true, silent = true})
+vim.api.nvim_set_keymap('n', '<F4>', "<cmd>lua require('lspsaga.floaterm').open_float_terminal('lazygit')<CR>", {noremap = true, silent = true})
+
+
+
+
 
