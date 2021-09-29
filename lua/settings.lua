@@ -11,6 +11,10 @@ vim.o.encoding = "UTF-8"
 vim.o.undofile = true 
 
 
+-- auto change directory
+-- vim.cmd[[autocmd! BufCreate,BufEnter * lcd %:p:h]]
+-- vim.cmd[[autocmd! VimEnter * lcd %:p:h]]
+
 
 -- vim.g.netrw_banner = 0
 -- vim.g.loaded_netrw = 0

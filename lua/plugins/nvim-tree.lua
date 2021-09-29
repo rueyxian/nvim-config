@@ -1,36 +1,5 @@
---[[
-local g = vim.g
-
--- Plugin: nvim-tree
---- https://github.com/kyazdani42/nvim-tree.lua
-g.nvim_tree_width = 40
-g.nvim_tree_ignore = {'.git', 'node_modules', '.cache'}
-g.nvim_tree_gitignore = 1
-g.nvim_tree_auto_open = 1
-g.nvim_tree_indent_markers = 1
-g.nvim_tree_hide_dotfiles = 1
-g.nvim_tree_git_hl = 1
-g.nvim_tree_width_allow_resize  = 1
-g.nvim_tree_special_files = {'README.md', 'Makefile', 'MAKEFILE'}
-g.nvim_tree_show_icons = {
-  git = 1,
-  folders = 1,
-  files = 1
-}
-
-g.nvim_tree_icons = {
-	default = "‣ "
-}
-
---]]
-
--- Keybindings are defined in `keymapping.lua`
---- See: `help NvimTree`
---- https://github.com/kyazdani42/nvim-tree.lua#keybindings
 
 
-
----[[
 
 
 vim.g.nvim_tree_side = 'left'                                -- left by default
@@ -60,7 +29,7 @@ vim.g.nvim_tree_hijack_cursor = 0                             -- 1 by default, w
 vim.g.nvim_tree_icon_padding = ' '                            -- one space by default, used for rendering the space between the icon and the filename. Use with caution, it could break rendering if you set an empty string depending on your font.
 vim.g.nvim_tree_symlink_arrow = ' >> '                        --  defaults to ' ➛ '. used as a separator between symlinks' source and target.
 vim.g.nvim_tree_update_cwd = 1                                -- 0 by default, will update the tree cwd when changing nvim's directory (DirChanged event). Behaves strangely with autochdir set.
-vim.g.nvim_tree_respect_buf_cwd = 1                           -- 0 by default, will change cwd of nvim-tree to that of new buffer's when opening nvim-tree.
+vim.g.nvim_tree_respect_buf_cwd = 0                           -- 0 by default, will change cwd of nvim-tree to that of new buffer's when opening nvim-tree.
 vim.g.nvim_tree_refresh_wait = 500                            -- 1000 by default, control how often the tree can be refreshed, 1000 means the tree can be refresh once per 1000ms.
 
 

@@ -100,10 +100,9 @@ vim.api.nvim_set_keymap('x', 'J', ':move \'>+1<CR>gv=gv', {noremap = true, silen
 vim.cmd[[cnoreabbrev <silent> hlc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "let @/=''" : "hlc")<CR>]]
 
 
--- TODO
--- change directory
--- vim.cmd[[cnoreabbrev <silent> chdir <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h<CR>:pwd" : "chdir")<CR>]]
--- vim.cmd[[cnoreabbrev <silent> chdir <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h" : "chdir")<CR>:pwd<CR>]]
+-- change current working directory
+-- vim.cmd[[cnoreabbrev <silent> cwd <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h\|pwd" : "cwd")<CR>]]
+vim.cmd[[cnoreabbrev <silent> cwd <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h\|echo 'change working directory: '.getcwd()" : "cwd")<CR>]]
 
 
 

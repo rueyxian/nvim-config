@@ -11,51 +11,47 @@ end
 
 
 return require('packer').startup(function(use)
-      -- Packer can manage itself
-      use {'wbthomason/packer.nvim', opt = true}
+-- Packer can manage itself
+use {'wbthomason/packer.nvim', opt = true}
+    ------------------------------
+    -- color theme
+    ------------------------------
+    use 'fatih/molokai'
+    use 'morhetz/gruvbox'
+    use 'arcticicestudio/nord-vim'
+    use 'sainnhe/sonokai'
+    use 'sainnhe/gruvbox-material'
+    use 'sainnhe/everforest'
+    use 'sainnhe/edge'
+    use 'EdenEast/nightfox.nvim'
 
+    ------------------------------
+    --  statusline
+    ------------------------------
+    use 'hoob3rt/lualine.nvim'
 
-      ------------------------------
-      -- color theme
-      ------------------------------
-      use 'fatih/molokai'
-      use 'morhetz/gruvbox'
-      use 'arcticicestudio/nord-vim'
-      use 'sainnhe/sonokai'
-      use 'sainnhe/gruvbox-material'
-      use 'sainnhe/everforest'
-      use 'sainnhe/edge'
-      use 'EdenEast/nightfox.nvim'
+    ------------------------------
+    --  terminal
+    ------------------------------
+    use "akinsho/toggleterm.nvim"
 
+    ------------------------------
+    -- indentation guide
+    ------------------------------
+    use 'nathanaelkane/vim-indent-guides'
 
+    ------------------------------
+    -- comment
+    ------------------------------
+    use 'scrooloose/nerdcommenter'
 
-      ------------------------------
-      --  statusline
-      ------------------------------
-    use 'hoob3rt/lualine.nvim' 
-
-
-      ------------------------------
-      --  terminal
-      ------------------------------
-      use "akinsho/toggleterm.nvim"
-
-      ------------------------------
-      -- indentation guide
-      ------------------------------
-      use 'nathanaelkane/vim-indent-guides'
-
-      ------------------------------
-      -- comment
-      ------------------------------
-      use 'scrooloose/nerdcommenter'
-
-      ------------------------------
-      -- file explorer
-      ------------------------------
-      use {
-        'kyazdani42/nvim-tree.lua',
-        requires = 'kyazdani42/nvim-web-devicons'
+    ------------------------------
+    -- file explorer
+    ------------------------------
+    use {
+         'kyazdani42/nvim-tree.lua',
+         requires = 'kyazdani42/nvim-web-devicons',
+         -- config = function() require'nvim-tree'.setup {} end
       }
 
 
