@@ -102,7 +102,7 @@ vim.cmd[[cnoreabbrev <silent> hlc <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ?
 
 -- change current working directory
 -- vim.cmd[[cnoreabbrev <silent> cwd <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h\|pwd" : "cwd")<CR>]]
-vim.cmd[[cnoreabbrev <silent> cwd <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h\|echo 'change working directory: '.getcwd()" : "cwd")<CR>]]
+vim.cmd[[cnoreabbrev <silent> cwd <C-r>=(getcmdtype()==#':' && getcmdpos()==#1 ? "cd %:p:h\|echo 'change working directory: \"'.getcwd().'\"'" : "cwd")<CR>]]
 
 
 

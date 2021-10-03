@@ -45,6 +45,9 @@ require('lspsaga').init_lsp_saga(opts)
 
 
 
+
+
+
 ------------------------------------------------------------------------------------------
 -- key mapping
 ------------------------------------------------------------------------------------------
@@ -68,8 +71,9 @@ vim.api.nvim_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', {no
 
 -- definition
 vim.api.nvim_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', {noremap = true, silent = true})
--- TODO: lspsaga code doesn't werk
--- vim.api.nvim_set_keymap('n', 'gd', "<cmd>lua require'lspsaga.provider'.preview_definition()<CR>" , {noremap = true, silent = true})
+
+-- definition preview
+vim.api.nvim_set_keymap('n', 'gp', "<cmd>lua require'lspsaga.provider'.preview_definition()<CR>" , {noremap = true, silent = true})
 
 
 ------------------------------------------------------------
@@ -82,7 +86,9 @@ vim.api.nvim_set_keymap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<CR>', 
 ------------------------------------------------------------
 -- hover
 ------------------------------------------------------------
-vim.api.nvim_set_keymap('n', '<Leader>k', "<cmd>lua require('lspsaga.hover').render_hover_doc()<CR>", {noremap = true, silent = true})
+-- default version is preferred over lspsaga version
+vim.api.nvim_set_keymap('n', '<Leader>k', "<cmd>lua vim.lsp.buf.hover()<CR>", {noremap = true, silent = true})
+-- vim.api.nvim_set_keymap('n', '<Leader>k', "<cmd>lua require('lspsaga.hover').render_hover_doc()<CR>", {noremap = true, silent = true})
 
 
 

@@ -54,7 +54,18 @@ for _, lsp in ipairs(servers) do
   }
 end
 
+------------------------------------------------------------
+-- disable CompletionItemKind.Text
+------------------------------------------------------------
+-- TODO [Text] results not only useless and also super annoying
+-- local capabilities = require('vim.lsp.protocol').make_client_capabilities()
+-- capabilities.textDocument.completion.completionItem.snippetSupport = false
 
+
+
+------------------------------------------------------------
+-- key mappings
+------------------------------------------------------------
 vim.api.nvim_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<CR>', {noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', {noremap = true, silent = true})
 vim.api.nvim_set_keymap('n', '<Leader>k', '<cmd>lua vim.lsp.buf.hover()<CR>', {noremap = true, silent = true})

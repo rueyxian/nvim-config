@@ -1,21 +1,45 @@
 
 local lualine = require 'lualine'
 
--- Color table for highlights
+-- color table for highlights
 local colors = {
-    bg = '#222730',
-    fg = '#bbc2cf',
-    fg2 = '#8190b3',
-    white = '#aaaaaa',
-    yellow = '#ECBE7B',
-    cyan = '#008080',
-    darkblue = '#081633',
-    green = '#98be65',
-    orange = '#FF8800',
-    violet = '#a9a1e1',
-    magenta = '#c678dd',
-    blue = '#51afef',
-    red = '#ec5f67',
+    nord_night_1 = '#2E3440',
+    nord_night_2 = '#3B4252',
+    nord_night_3 = '#434C5E',
+    nord_night_4 = '#4C566A',
+    nord_snow_1 = '#D8DEE9',
+    nord_snow_2 = '#E5E9F0',
+    nord_snow_3 = '#ECEFF4',
+    nord_frost_1 = '#8FBCBB',
+    nord_frost_2 = '#88C0D0',
+    nord_frost_3 = '#81A1C1',
+    nord_frost_4 = '#5E81AC',
+    nord_aurora_1 = '#BF616A',
+    nord_aurora_2 = '#D08770',
+    nord_aurora_3 = '#EBCB8B',
+    nord_aurora_4 = '#A3BE8C',
+    nord_aurora_5 = '#B48EAD',
+
+   nord_brightness_1 = '#4e586d',
+   nord_brightness_2 = '#505b70',
+   nord_brightness_3 = '#525d73',
+   nord_brightness_4 = '#556076',
+   nord_brightness_5 = '#576279',
+   nord_brightness_6 = '#59647c',
+   nord_brightness_7 = '#5b677f',
+   nord_brightness_8 = '#5d6982',
+   nord_brightness_9 = '#5f6c85',
+   nord_brightness_10 = '#616e88',
+   nord_brightness_11 = '#63718b',
+   nord_brightness_12 = '#66738e',
+   nord_brightness_13 = '#687591',
+   nord_brightness_14 = '#6a7894',
+   nord_brightness_15 = '#6d7a96',
+   nord_brightness_16 = '#6f7d98',
+   nord_brightness_17 = '#72809a',
+   nord_brightness_18 = '#75829c',
+   nord_brightness_19 = '#78859e',
+   nord_brightness_20 = '#7b88a1',
 }
 
 local conditions = {
@@ -34,16 +58,14 @@ local config = {
     -- Disable sections and component separators
     component_separators = "",
     section_separators = "║",
-    -- theme = 'auto',
-    theme = 'nord',
-    -- theme = 'gruvbox',
-    -- theme = {
-    --   -- We are going to use lualine_c an lualine_x as left and
-    --   -- right section. Both are highlighted by c theme .  So we
-    --   -- are just setting default looks o statusline
-    --   normal = {c = {fg = colors.fg, bg = colors.bg}},
-    --   inactive = {c = {fg = colors.fg, bg = colors.bg}}
-    -- }
+    -- theme = 'nord',
+    theme = {
+      -- We are going to use lualine_c an lualine_x as left and
+      -- right section. Both are highlighted by c theme .  So we
+      -- are just setting default looks o statusline
+      normal = {c = {fg = colors.nord_snow_1, bg = colors.nord_night_2}},
+      inactive = {c = {fg = colors.nord_snow_1, bg = colors.nord_night_1}}
+    }
   },
   sections = {
     -- these are to remove the defaults
@@ -77,57 +99,6 @@ local function ins_right(component)
 end
 
 
-
-----------------------------------------------------------
--- mode color
-----------------------------------------------------------
-local mode_color = {
-    n = '#aaaaaa',
-    i = colors.yellow,
-    v = colors.green,
-    [''] = colors.green,
-    V = colors.green,
-    c = colors.blue,
-    no = '#000000',
-    s = '#000000',
-    S = '#000000',
-    [''] = '#000000',
-    ic = '#000000',
-    R = colors.red,
-    Rv = colors.red,
-    cv = '#000000',
-    ce = '#000000',
-    r = '#000000',
-    rm = '#000000',
-    ['r?'] = '#000000',
-    ['!'] = '#000000',
-    t = colors.violet,
-}
-
--- local mode_icon = {
---     n = '○',
---     i = '◌',
---     v = '⦿',
---     [''] = '●',
---     V = '●',
---     c = '◐',
---     no = 'no',
---     s = 's',
---     S = 'S',
---     [''] = '^S',
---     ic = 'ic',
---     R = 'R',
---     Rv = 'Rv',
---     cv = 'cv',
---     ce = 'ce',
---     r = 'r',
---     rm = 'rm',
---     ['r?'] = 'r?',
---     ['!'] = '!',
---     t = '✤'
--- }
-
-
 ----------------------------------------------------------
 -- left padding
 ----------------------------------------------------------
@@ -140,20 +111,57 @@ local mode_color = {
 --     padding = 1,
 -- }
 
-
-
 ----------------------------------------------------------
--- filetype component
+-- encoding component
 ----------------------------------------------------------
 ins_left {
-    'filetype',
-    condition = conditions.buffer_not_empty,
+    'o:encoding',
     upper = true,
-    color = {fg = colors.fg},
-    padding_left = 0,
-    padding_right = 1,
+    condition = conditions.hide_in_width,
+    -- color = {fg = colors.nord_frost_4},
+    color = {fg = colors.nord_brightness_20},
+    left_padding = 0,
+    right_padding = 0,
 }
 
+
+----------------------------------------------------------
+-- file format component
+----------------------------------------------------------
+ins_left {
+    'fileformat',
+    upper = true,
+    icons_enabled = false,
+    -- color = {fg = colors.nord_frost_4},
+    color = {fg = colors.nord_brightness_20},
+    right_padding = 0,
+}
+
+----------------------------------------------------------
+-- filesize component
+----------------------------------------------------------
+ins_left {
+    function()
+        local function format_file_size(file)
+            local size = vim.fn.getfsize(file)
+            if size <= 0 then return '' end
+                local sufixes = {'B', 'KB', 'MB', 'GB'}
+                local i = 1
+                while size > 1024 do
+                size = size / 1024
+                i = i + 1
+            end
+            return string.format('%.1f%s', size, sufixes[i])
+        end
+        local file = vim.fn.expand('%:p')
+        if string.len(file) == 0 then return '' end
+        return format_file_size(file)
+    end,
+    condition = conditions.buffer_not_empty,
+    -- color = {fg = colors.nord_frost_4},
+    color = {fg = colors.nord_brightness_20},
+    right_padding = 1,
+}
 
 
 ----------------------------------------------------------
@@ -183,7 +191,8 @@ ins_left {
         return dir
     end,
     condition = conditions.buffer_not_empty,
-    color = {fg = colors.fg2},
+    -- color = {fg = colors.nord_brightness_15},
+    color = {fg = colors.nord_brightness_10},
     -- padding_right = 0,
     padding = 0,
 }
@@ -197,9 +206,35 @@ ins_left {
         return vim.fn.expand('%:t')
     end,
     condition = conditions.buffer_not_empty,
-    color = {fg = colors.fg},
+    color = {fg = colors.nord_frost_1},
     -- padding_right = 0,
     padding = 0,
+}
+
+
+----------------------------------------------------------
+-- git branch
+----------------------------------------------------------
+ins_left {
+    'branch',
+    icon = '',
+    condition = conditions.check_git_workspace,
+    color = {fg = colors.nord_brightness_10},
+    right_padding = 0,
+}
+
+
+----------------------------------------------------------
+-- git diff
+----------------------------------------------------------
+ins_left {
+    'diff',
+    -- symbols = {added = ' ', modified = ' ', removed = ' '},
+    color_added = colors.nord_aurora_4,
+    color_modified = colors.nord_aurora_2,
+    color_removed = colors.nord_aurora_1,
+    condition = conditions.hide_in_width,
+    right_padding = 1,
 }
 
 ----------------------------------------------------------
@@ -228,8 +263,8 @@ ins_left {
     return msg
   end,
   icon = '',
-  color = {fg = colors.fg2},
-  right_padding = 0, 
+  color = {fg = colors.nord_brightness_10},
+  right_padding = 0,
 }
 
 
@@ -240,107 +275,47 @@ ins_left {
   'diagnostics',
   sources = {'nvim_lsp'},
   symbols = {error = ' ', warn = ' ', info = ' ', hint = ' '},
-
-  color_error = colors.red,
-  color_warn = colors.yellow,
-  color_info = colors.green,
-  color_hint = colors.blue
+  color_error = colors.nord_aurora_1,
+  color_warn = colors.nord_aurora_2,
+  color_info = colors.nord_aurora_4,
+  color_hint = colors.nord_aurora_5
 
 }
 
 
 ----------------------------------------------------------
--- git branch
+-- filetype component
 ----------------------------------------------------------
 ins_right {
-    'branch',
-    icon = '',
-    condition = conditions.check_git_workspace,
-    color = {fg = colors.fg},
-    right_padding = 0,
-}
-
-
-----------------------------------------------------------
--- git diff
-----------------------------------------------------------
-ins_right {
-    'diff',
-    -- symbols = {added = '落', modified = 'ﱤ ', removed = 'x '},
-    color_added = colors.green,
-    color_modified = colors.orange,
-    color_removed = colors.red,
-    condition = conditions.hide_in_width,
-    right_padding = 1,
-}
-
-
-----------------------------------------------------------
--- encoding component
-----------------------------------------------------------
-ins_right {
-    'o:encoding', 
-    upper = true, 
-    condition = conditions.hide_in_width,
-    color = {fg = colors.fg2},
-    right_padding = 0,
-}
-
-
-----------------------------------------------------------
--- file format component
-----------------------------------------------------------
-ins_right {
-      'fileformat',
-      upper = true,
-      icons_enabled = false,
-      color = {fg = colors.fg2},
-    right_padding = 0,
-}
-
-
-----------------------------------------------------------
--- filesize component
-----------------------------------------------------------
-ins_right {
-    function()
-        local function format_file_size(file)
-            local size = vim.fn.getfsize(file)
-            if size <= 0 then return '' end
-                local sufixes = {'B', 'KB', 'MB', 'GB'}
-                local i = 1
-                while size > 1024 do
-                size = size / 1024
-                i = i + 1
-            end
-            return string.format('%.1f%s', size, sufixes[i])
-        end
-        local file = vim.fn.expand('%:p')
-        if string.len(file) == 0 then return '' end
-        return format_file_size(file)
+    function ()
+        return vim.bo.filetype
     end,
     condition = conditions.buffer_not_empty,
-    color = {fg = colors.fg2},
-    right_padding = 1,
+    upper = true,
+    -- color = {fg = colors.nord_aurora_3},
+    color = {fg = colors.nord_frost_3},
+    padding_left = 0,
+    padding_right = 0,
 }
-
 
 ----------------------------------------------------------
 -- location component
 ----------------------------------------------------------
 ins_right {
-    'location', 
-    color = {fg = colors.fg},
+    'location',
+    color = {fg = colors.nord_brightness_10},
+    left_padding = 0,
+    right_padding = 1,
+}
+
+----------------------------------------------------------
+-- location component
+----------------------------------------------------------
+ins_right {
+    'progress',
+    color = {fg = colors.nord_brightness_20},
+    left_padding = 0,
     right_padding = 0,
-}
-
-----------------------------------------------------------
--- location component
-----------------------------------------------------------
-ins_right {
-    'progress', 
-    color = {fg = colors.fg},
-    right_padding = 1,
 }
 
 

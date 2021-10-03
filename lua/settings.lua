@@ -86,7 +86,7 @@ vim.g.completetion_matching_strategy_list = {'exact', 'substring', 'fuzzy'}
 -- http://stackoverflow.com/questions/20186975/vim-mac-how-to-copy-to-clipboard-without-pbcopy
 if vim.fn.has('unnamedplus') == 1 then
   vim.opt_global.clipboard:prepend('unnamed')
-  vim.opt_global.clipboard:prepend('unnamedplus')
+  -- vim.opt_global.clipboard:prepend('unnamedplus')
 end
 
 
