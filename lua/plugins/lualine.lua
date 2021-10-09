@@ -206,7 +206,7 @@ ins_left {
         return vim.fn.expand('%:t')
     end,
     condition = conditions.buffer_not_empty,
-    color = {fg = colors.nord_frost_1},
+    color = {fg = colors.nord_aurora_2},
     -- padding_right = 0,
     padding = 0,
 }
@@ -231,7 +231,7 @@ ins_left {
     'diff',
     -- symbols = {added = ' ', modified = ' ', removed = ' '},
     color_added = colors.nord_aurora_4,
-    color_modified = colors.nord_aurora_2,
+    color_modified = colors.nord_aurora_3,
     color_removed = colors.nord_aurora_1,
     condition = conditions.hide_in_width,
     right_padding = 1,
@@ -276,9 +276,9 @@ ins_left {
   sources = {'nvim_lsp'},
   symbols = {error = ' ', warn = ' ', info = ' ', hint = ' '},
   color_error = colors.nord_aurora_1,
-  color_warn = colors.nord_aurora_2,
+  color_warn = colors.nord_aurora_3,
   color_info = colors.nord_aurora_4,
-  color_hint = colors.nord_aurora_5
+  color_hint = colors.nord_frost_4,
 
 }
 
@@ -292,8 +292,8 @@ ins_right {
     end,
     condition = conditions.buffer_not_empty,
     upper = true,
-    -- color = {fg = colors.nord_aurora_3},
-    color = {fg = colors.nord_frost_3},
+    color = {fg = colors.nord_aurora_5},
+    -- color = {fg = colors.nord_frost_3},
     padding_left = 0,
     padding_right = 0,
 }

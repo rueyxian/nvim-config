@@ -84,10 +84,13 @@ vim.g.completetion_matching_strategy_list = {'exact', 'substring', 'fuzzy'}
 -- enable to copy to clipboard for operations like yank, delete, change and put
 ------------------------------------------------------------
 -- http://stackoverflow.com/questions/20186975/vim-mac-how-to-copy-to-clipboard-without-pbcopy
-if vim.fn.has('unnamedplus') == 1 then
-  vim.opt_global.clipboard:prepend('unnamed')
-  -- vim.opt_global.clipboard:prepend('unnamedplus')
-end
+-- vim.opt.clipboard = 'unnamedplus'
+vim.opt.clipboard = 'unnamed'
+
+-- if vim.fn.has('unnamedplus') == 1 then
+--   vim.opt_global.clipboard:prepend('unnamed')
+--   -- vim.opt_global.clipboard:prepend('unnamedplus')
+-- end
 
 
 

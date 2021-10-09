@@ -21,6 +21,10 @@ vim.api.nvim_set_keymap('i', '<F10>', '<Esc>:quit<CR>', {noremap = true, silent 
 -- close quickfix window
 vim.api.nvim_set_keymap('n', '<leader>a', ':cclose<CR>', {noremap = true, silent = true})
 
+-- escape from terminal
+-- vim.api.nvim_set_keymap('t', '<Esc>', '<C-\\><C-n>', {noremap = true, silent = true})
+vim.api.nvim_set_keymap('t', '<C-\\>', '<C-\\><C-n>', {noremap = true, silent = true})
+
 -- escape to normal mode
 -- vim.api.nvim_set_keymap('i', '<C-i>', '<ESC>', {noremap = true})
 -- vim.api.nvim_set_keymap('v', '<C-i>', '<ESC>', {noremap = true})
@@ -47,14 +51,10 @@ vim.api.nvim_set_keymap('v', 'K', '{', {noremap = true})
 vim.api.nvim_set_keymap('v', 'J', '}', {noremap = true})
 
 
--- swap paragraph movement
--- vim.api.nvim_set_keymap('n', '{', '}', {noremap = true})
--- vim.api.nvim_set_keymap('n', '}', '{', {noremap = true})
-
 -- switch buffer
-vim.api.nvim_set_keymap('n', '\\', ':bnext<CR>', {noremap = true, silent = true})
--- vim.api.nvim_set_keymap('n', '<S-\\>', ':bprev<CR>', {noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<C-\\>', ':bprev<CR>', {noremap = true, silent = true})
+-- TODO rarely use, consider remove
+-- vim.api.nvim_set_keymap('n', '\\', ':bnext<CR>', {noremap = true, silent = true})
+-- vim.api.nvim_set_keymap('n', '<C-\\>', ':bprev<CR>', {noremap = true, silent = true})
 
 
 -- split & vsplit

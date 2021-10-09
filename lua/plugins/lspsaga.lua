@@ -149,9 +149,16 @@ vim.api.nvim_set_keymap('n', ']e', "<cmd>lua require'lspsaga.diagnostic'.lsp_jum
 -- float terminal
 ------------------------------------------------------------
 -- <C-\><C-n> : escape from terminal
-vim.api.nvim_set_keymap('n', '<F3>', "<cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap('n', '<Leader><F3>', ":cd %:p:h<CR><cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>", {noremap = true, silent = true})
-vim.api.nvim_set_keymap('t', '<F3>', "<C-\\><C-n>:lua require('lspsaga.floaterm').close_float_terminal()<CR>", {noremap = true, silent = true})
+local close_term = "<cmd>lua require('lspsaga.floaterm').close_float_terminal()<CR>"
+local open_term = "<cmd>lua require('lspsaga.floaterm').open_float_terminal()<CR>"
+
+local open_or_close_term = "&buftype ==# 'terminal' ? \"" .. close_term  .. "\" : \"" .. open_term .. "\""
+local cwd_open_or_close_term = "&buftype ==# 'terminal' ? \"" .. close_term  .. "\" : \"" .. ":cd %:p:h<CR>" .. open_term .. "\""
+
+vim.api.nvim_set_keymap('n', '<F3>', open_or_close_term, {noremap = true, silent = true, expr = true})
+vim.api.nvim_set_keymap('n', '<Leader><F3>', cwd_open_or_close_term, {noremap = true, silent = true, expr = true})
+vim.api.nvim_set_keymap('t', '<F3>', "<C-\\><C-n>" .. close_term, {noremap = true, silent = true})
+
 -- requires lazygit
 -- brew install lazygit
 vim.api.nvim_set_keymap('n', '<F4>', "<cmd>lua require('lspsaga.floaterm').open_float_terminal('lazygit')<CR>", {noremap = true, silent = true})
